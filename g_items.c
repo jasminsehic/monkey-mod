@@ -217,7 +217,8 @@ qboolean Pickup_Adrenaline (edict_t *ent, edict_t *other)
 {
 	//if (!deathmatch->value)
 	//	other->max_health += 1;
-
+	if (other->health==other->max_health)
+		return false;
 	if (other->health < other->max_health)
 		other->health = other->max_health;
 
@@ -520,8 +521,13 @@ qboolean Pickup_Key (edict_t *ent, edict_t *other)
 		}
 		return true;
 	}
-	
-	other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
+	if ((strcmp(ent->classname, "item_flashlight") == 0) && other->client->pers.inventory[ITEM_INDEX(ent->item)])
+		return false;
+	else
+		other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
+
+	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
+		SetRespawn (ent, 30);
 	return true;
 }
 
@@ -742,6 +748,8 @@ qboolean Pickup_Pistol_Mods (edict_t *ent, edict_t *other)
 	}
 	else if (ent->count == 4)
 	{
+		if(other->client->pers.pistol_mods>=WEAPON_MOD_COOLING_JACKET)
+			return false;
 		other->client->pers.pistol_mods |= WEAPON_MOD_COOLING_JACKET;
 		other->client->pers.hmg_shots = 30;
 	}

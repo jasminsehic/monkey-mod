@@ -557,13 +557,156 @@ voice_table_t momo_specific [] =
 
 
 
-voice_table_t mj_random [] =
+//TiCaL start taunt voice table
+
+voice_table_t momo_random [] =
 {
-	{NULL, "What's goin' on?",					"What's goin' on?",					"actors/skidrow/magicj/idle1.wav", 0, {0,0,0,0,0}, 0, 0 , TT_POSITIVE},
-	{NULL, "Man, I ain't seen shit",			"Man, I ain't seen @*%$#!",			"actors/skidrow/magicj/idle2.wav", 0, {0,0,0,0,0}, 0, 0 , TT_POSITIVE},
-	{NULL, "I don't know nothin'",				"I don't know nothin'",				"actors/skidrow/magicj/idle3.wav", 0, {0,0,0,0,0}, 0, 0 , TT_POSITIVE},
-	{NULL, "What's up man?",					"What's up man?",					"actors/skidrow/magicj/idle4.wav", 0, {0,0,0,0,0}, 0, 0 , TT_POSITIVE},
+	
+	{NULL, "","",	"actors/male/momo/scram.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",	"actors/male/momo/hostile1.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",	"actors/male/momo/hostile2.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",	"actors/male/momo/comeback2.wav",	0, {0,0,0,0,0}, 0, 0 , TT_POSITIVE},
+	{NULL, "","",	"actors/male/momo/ladiesroom.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",	"actors/male/momo/idle2.wav",		0, {0,0,0,0,0}, 0, 0 , TT_POSITIVE},
+	{NULL, "","",	"actors/male/momo/idle3.wav",		0, {0,0,0,0,0}, 0, 0 , TT_POSITIVE},
+	{NULL, "","",	"actors/male/momo/idle4.wav",		0, {0,0,0,0,0}, 0, 0 , TT_POSITIVE},
+
 };
+
+voice_table_t lamont_random[] = 
+{
+	{NULL, "","",		"actors/male/lamont/babble1.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/lamont/babble2.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/lamont/mfcomeout.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+//3																					
+	{NULL, "","",		"actors/male/lamont/killem.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/lamont/lenny1.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/lamont/lenny2.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+//6
+	{NULL, "","",		"actors/male/lamont/lenny3.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/lamont/lookin'at2.wav",	0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/lamont/fuckyou.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+//9																					
+	{NULL, "","",		"actors/male/lamont/getsome.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/lamont/lookin'at1.wav",	0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+//11																				
+	{NULL, "","",		"actors/male/lamont/fuckinprob.wav",	0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/lamont/offstreet1.wav",	0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/lamont/offstreet2.wav",	0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/lamont/outofface.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
+};
+
+voice_table_t kingpin_random[] = 
+{
+	{NULL, "","",		"actors/male/kingpin/fight1.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/kingpin/fight2.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/kingpin/fight3.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/kingpin/fight4.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/kingpin/funny1.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/kingpin/funny2.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/kingpin/funny3.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/kingpin/funny4.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/kingpin/funny5.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/kingpin/funny6.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/kingpin/funny8.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/kingpin/death1.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	
+};
+
+voice_table_t jesus_random[] = 
+{
+	{NULL, "","",		"actors/male/jesus/battery.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/jesus/fight2.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/jesus/fight3.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/jesus/fight4.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/jesus/funny1.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/jesus/funny2.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/jesus/funny3.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/jesus/funny4.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/jesus/fight1.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/jesus/funny6.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/jesus/pain3.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+
+};
+
+voice_table_t tyrone_random[] = 
+{
+	{NULL, "","",		"actors/male/tyrone/funny5.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/tyrone/fight2.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/tyrone/fight3.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/tyrone/funny6.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/tyrone/funny1.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/tyrone/funny2.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/tyrone/funny3.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/tyrone/funny4.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/tyrone/fight1.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+
+};
+
+voice_table_t willy_random[] = 
+{
+	{NULL, "","",		"actors/male/willy/fight1.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/willy/fight2.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/willy/fight3.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/willy/fight5.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/willy/fight4.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+
+};
+
+voice_table_t moker_random[] = 
+{
+	{NULL, "","",		"actors/male/moker/fight2.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/moker/fight3.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/moker/fight4.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/moker/funny1.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/moker/funny2.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/moker/funny3.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/moker/funny4.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/moker/fight1.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/moker/funny6.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/moker/funny5.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+};
+
+voice_table_t heilman_random[] = 
+{
+	{NULL, "","",		"actors/male/heilman/fight2.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/heilman/fight3.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/heilman/fight4.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/heilman/funny1.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/heilman/funny2.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/heilman/funny3.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/heilman/funny4.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/heilman/fight1.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/heilman/funny6.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/heilman/funny5.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/heilman/funny7.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/male/heilman/pain1.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+
+};
+
+voice_table_t leroy_random[] = 
+{
+	{NULL, "","",		"actors/skidrow/leroy/conv10.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/skidrow/leroy/die.wav",			0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/skidrow/leroy/fuckyou.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/skidrow/leroy/conv8.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/skidrow/leroy/stepoff.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/skidrow/leroy/conv9.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/skidrow/leroy/mybitch1.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/skidrow/leroy/mybitch2.wav",	0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/skidrow/leroy/warned.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+
+};
+
+voice_table_t mj_random[] = 
+{
+	{NULL, "","",		"actors/skidrow/magicj/beback.wav.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/skidrow/magicj/fuckshit.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/skidrow/magicj/fuckup.wav",			0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+	{NULL, "","",		"actors/skidrow/magicj/fuckthat.wav",		0, {0,0,0,0,0}, 0, 0 , TT_NEGATIVE},
+
+};
+//TiCaL end voice table
 
 
 // JOSEPH 29-MAY-99
@@ -592,29 +735,6 @@ voice_table_t player_answer[] =
 {
 	{NULL, "no",			"no",			"actors/player/male/no.wav",	0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
 	{NULL, "yes",			"yes",			"actors/player/male/yes.wav",	0, {0,0,0,0,0},0,0 , TT_POSITIVE},
-};
-
-voice_table_t lamont_random[] = 
-{
-	{NULL, "why you come around lookin' ...",											"why you come around lookin' ...",										"actors/male/lamont/babble1.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-	{NULL, "motherfucker is gonna be dead...",											"@*%$#! is gonna be dead...",											"actors/male/lamont/babble2.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-	{NULL, "motherfucker's gonna come out...",											"@*%$#!s gonna come out...",											"actors/male/lamont/mfcomeout.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-//3																					
-	{NULL, "I swear I'm gonna kill him...",												"I swear I'm gonna kill him...",										"actors/male/lamont/killem.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-	{NULL, "lenny gonna get my shit out there",											"lenny gonna get my @*%$#! out there",									"actors/male/lamont/lenny1.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-	{NULL, "I tell you lenny ain't gonna do that shit to me",							"I tell you lenny ain't gonna do that @*%$#! to me",					"actors/male/lamont/lenny2.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-//6
-	{NULL, "motherfuckin' get me in that bar I'm gonna get that Lenny...",				"goin get me in that bar... I'm gonna get that Lenny...",				"actors/male/lamont/lenny3.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-	{NULL, "kill that motherfucker I swear to god... What the Fuck you lookin' at?",	"kill that @*%$#! I swear to god... What the @*%$#! you lookin' at?",	"actors/male/lamont/lookin'at2.wav",	0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-	{NULL, "fuck you motherfuckers",													"@*%$#! you @*%$#!",													"actors/male/lamont/fuckyou.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-//9																					
-	{NULL, "you think you're gonna get somma dat out there...",							"you think you're gonna get somma dat out there...",					"actors/male/lamont/getsome.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-	{NULL, "what the fuck you lookin' at?",												"what the @*%$#! you lookin' at?",										"actors/male/lamont/lookin'at1.wav",	0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-//11																				
-	{NULL, "you got a fuckin' problem?",												"you got a @*%$#! problem?",											"actors/male/lamont/fuckinprob.wav",	0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-	{NULL, "man get the fuck off my street",											"man get the @*%$#! off my street",										"actors/male/lamont/offstreet1.wav",	0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-	{NULL, "you better get the fuck off my street",										"you better get the @*%$#! off my street",								"actors/male/lamont/offstreet2.wav",	0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
-	{NULL, "Man, get the fuck out my face motherfucker",								"Man, get the @*%$#! out my face @*%$#!",								"actors/male/lamont/outofface.wav",		0, {0,0,0,0,0},0,0 , TT_NEGATIVE},
 };
 
 voice_table_t lenny_table[] =

@@ -761,7 +761,7 @@ if (!deathmatch->value)
 	
 }
 
-	BeginIntermission (self);
+	BeginIntermission (self, self->map);
 }
 
 void SP_target_changelevel (edict_t *ent)

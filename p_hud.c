@@ -121,7 +121,7 @@ void MoveClientToIntermission (edict_t *ent)
 
 }
 
-void BeginIntermission (edict_t *targ)
+void BeginIntermission (edict_t *targ, char *changenext)
 {
 	int		i, n;
 	edict_t	*ent, *client;
@@ -141,9 +141,16 @@ void BeginIntermission (edict_t *targ)
 			respawn(client);
 	}
 
+	if(level.changemap!=NULL)free(level.changemap);
+
 	level.intermissiontime = level.time;
+	level.changemap = (char *)malloc(MAX_QPATH);
 	
-	level.changemap = targ->map;
+	//level.changemap = targ->map;
+	strcpy (level.changemap, changenext);
+	//gi.bprintf (PRINT_HIGH, "2 %s\n", level.changemap);
+
+	//gi.bprintf (PRINT_HIGH, "Next map will be: %s,%s.\n", level.changemap, targ->map);
 
 	if (strstr(level.changemap, "*"))
 	{
@@ -1462,7 +1469,8 @@ void DeathmatchScoreboardMessage (edict_t *ent)
 		}
 		} else
 			Com_sprintf (entry, sizeof(entry),
-				"xr %i yv %i dmstr 442 \"NAME         ping  acc   fav\"",
+		//		"xr %i yv %i dmstr 442 \"NAME         ping  acc   fav\"",
+				"xr %i yv %i dmstr 442 \"NAME       deaths  acc   fav\"",
 				-36*10 - 10, -60+-2*14 );
 	}
 //#else
@@ -1572,11 +1580,13 @@ void DeathmatchScoreboardMessage (edict_t *ent)
 				}
 				Com_sprintf (entry, sizeof(entry),
 					"yv %i dmstr %s \"%s%4i %4i ",// %5i\" ",		// 48 chars
-					-60+i*16, tag, nfill, cl->ping, cl->resp.accshot?cl->resp.acchit*1000/cl->resp.accshot:0);
+					//-60+i*16, tag, nfill, cl->ping, cl->resp.accshot?cl->resp.acchit*1000/cl->resp.accshot:0);
+					-60+i*16, tag, nfill, cl->resp.deposited, cl->resp.accshot?cl->resp.acchit*1000/cl->resp.accshot:0);
 			} else
 				Com_sprintf (entry, sizeof(entry),
 					"yv %i dmstr %s \"%16s   %4i  %4i ",
-					-60+i*16, tag, cl->pers.netname, cl->ping, cl->resp.accshot?cl->resp.acchit*1000/cl->resp.accshot:0);
+					//-60+i*16, tag, cl->pers.netname, cl->ping, cl->resp.accshot?cl->resp.acchit*1000/cl->resp.accshot:0);
+					-60+i*16, tag, cl->pers.netname, cl->resp.deposited, cl->resp.accshot?cl->resp.acchit*1000/cl->resp.accshot:0);
 
 			for (j=0;j<8;j++) {
 				if (cl->resp.fav[j]>fc) {

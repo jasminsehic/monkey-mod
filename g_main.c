@@ -423,7 +423,7 @@ The timelimit or fraglimit has been exceeded
 void EndDMLevel (void)
 {
 	edict_t		*ent;
-	char		*nextmap;
+	char		*nextmap, changenext[MAX_QPATH];
 	int i;
 
 //	gi.cvar_set("password",default_password);
@@ -443,7 +443,8 @@ void EndDMLevel (void)
 		ent = G_Spawn ();
 		ent->classname = "target_changelevel";
 		ent->map = nextmap;
-
+		gi.bprintf (PRINT_HIGH, "Next map will be: %s.\n", ent->map);
+	
 		goto done;
 	}
 
@@ -470,6 +471,9 @@ done:
 	if (ent && ent->map)
 		gi.dprintf("DM changelevel: %s (time: %i secs)\n", ent->map, (int)level.time );
 
+	//hack to fix bug
+	strcpy(changenext, ent->map);
+
 	for_each_player(ent,i) 
 	{
 		HideWeapon(ent);
@@ -481,7 +485,7 @@ done:
 	gi.WriteString( va("play world/cypress%i.wav", 2+(rand()%4)) );
 	gi.multicast (vec3_origin, MULTICAST_ALL);
 
-	BeginIntermission (ent);
+	BeginIntermission (ent, changenext);
 }
 
 /*
@@ -626,6 +630,7 @@ void ExitLevel (void)
 		if (i==maxclients->value)
 			gi.cvar_set("modadmin","");
 	}
+	//gi.bprintf(PRINT_HIGH, "next is %s\n", level.changemap);
 
 	Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.changemap);
 	gi.AddCommandString (command);

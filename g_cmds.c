@@ -9,6 +9,7 @@ if (fixed_gametype) cprintf(ent,PRINT_HIGH,"This server's game type may not be c
 else {gi.cvar_set(a,value);cprintf(ent,PRINT_HIGH,"This setting will take effect with a map change\n");}
 
 extern int team_startcash[2];
+extern int memalloced[3];
 
 #define CLEAN_CLEAN		1
 #define CLEAN_ASUS		2
@@ -18,6 +19,26 @@ extern int team_startcash[2];
 #define CLEAN_OPENGL	6
 #define CLEAN_MODELS	7
 #define CLEAN_TIMED		8
+
+//tical - define taunts
+#define KINGPIN		1
+#define LEROY		2
+#define MJ			3
+#define MOMO		4
+#define LAMONT		5
+#define JESUS		6
+#define TYRONE		7
+#define WILLY		8
+#define MOKER		9
+#define HEILMAN		10
+
+#define BAMBI		11
+#define YOLANDA		12
+#define MONA		13
+#define LOLA		14
+#define BLUNT		15
+#define BETH		16
+
 
 
 // Papa - I just commented out the Kingpin's ban player code 
@@ -1657,9 +1678,9 @@ edict_t	*GetKeyEnt( edict_t *ent )
 }
 // END JOSEPH
 
-void Cmd_Wave_f (edict_t *ent, edict_t *other);
+void Cmd_Wave_f (edict_t *ent, edict_t *other, int who);
 
-void Cmd_Key_f (edict_t *ent)
+void Cmd_Key_f (edict_t *ent, int who)
 {
 	char		*cmd;
 
@@ -1672,12 +1693,12 @@ void Cmd_Key_f (edict_t *ent)
 
 	if (key_ent = GetKeyEnt( ent ))
 	{
-		void Cmd_Wave_f (edict_t *ent, edict_t *other);
+		void Cmd_Wave_f (edict_t *ent, edict_t *other, int who);
 		cast_memory_t *mem;
 
 		if (deathmatch->value)
 		{
-			Cmd_Wave_f( ent, key_ent );
+			Cmd_Wave_f( ent, key_ent, who );
 			return;
 		}
 
@@ -3641,7 +3662,7 @@ void Cmd_Players_f (edict_t *ent)
 Cmd_Wave_f
 =================
 */
-void Cmd_Wave_f (edict_t *ent, edict_t *other)
+void Cmd_Wave_f (edict_t *ent, edict_t *other, int who)
 {
 	char *cmd;
 //	int	rnd;
@@ -3666,90 +3687,76 @@ void Cmd_Wave_f (edict_t *ent, edict_t *other)
 	// say something
 	{
 		if (ent->gender == GENDER_MALE)
-			Voice_Random(ent, other, player_profanity_level2, NUM_PLAYER_PROFANITY_LEVEL2);
-		else if (ent->gender == GENDER_FEMALE)
-			Voice_Random(ent, other, f_profanity_level2, F_NUM_PROFANITY_LEVEL2);
-
-/*
-		if (!teamplay->value || (ent->client->pers.team != other->client->pers.team))
 		{
-			if (strstr(cmd, "key1"))
+			switch(who)
 			{
-				if (ent->gender == GENDER_MALE)
+				case 0: //random
 					Voice_Random(ent, other, player_profanity_level2, NUM_PLAYER_PROFANITY_LEVEL2);
-				else if (ent->gender == GENDER_FEMALE)
+					break;
+				case KINGPIN:
+					Voice_Random(ent, other, kingpin_random, NUM_KINGPIN_RANDOM);
+					break;
+				case LEROY:
+					Voice_Random(ent, other, leroy_random, NUM_LEROY_RANDOM);
+					break;
+				case MJ:
+					Voice_Random(ent, other, mj_random, NUM_MJ_RANDOM);
+					break;
+				case MOMO:
+					Voice_Random(ent, other, momo_random, NUM_MOMO_RANDOM);
+					break;
+				case LAMONT:
+					Voice_Random(ent, other, lamont_random, NUM_LAMONT_RANDOM);
+					break;
+				case JESUS:
+					Voice_Random(ent, other, jesus_random, NUM_JESUS_RANDOM);
+					break;
+				case TYRONE:
+					Voice_Random(ent, other, tyrone_random, NUM_TYRONE_RANDOM);
+					break;
+				case WILLY:
+					Voice_Random(ent, other, willy_random, NUM_WILLY_RANDOM);
+					break;
+				case MOKER:
+					Voice_Random(ent, other, moker_random, NUM_MOKER_RANDOM);
+					break;
+				case HEILMAN:
+					Voice_Random(ent, other, heilman_random, NUM_HEILMAN_RANDOM);
+					break;
+				default:
+					Voice_Random(ent, other, player_profanity_level2, NUM_PLAYER_PROFANITY_LEVEL2);
+			}
+		}
+		else if (ent->gender == GENDER_FEMALE)
+		{
+			switch(who)
+			{
+				case 0: //random
+					Voice_Random(ent, other, f_profanity_level2, F_NUM_PROFANITY_LEVEL2);
+					break;
+				case BAMBI:
+					Voice_Random(ent, other, bambi_random, F_NUM_BAMBI_RANDOM);
+					break;
+				case YOLANDA:
+					Voice_Random(ent, other, yolanda_random, F_NUM_YOLANDA_RANDOM);
+					break;
+				case MONA:
+					Voice_Random(ent, other, mona_random, F_NUM_MONA_RANDOM);
+					break;
+				case LOLA:
+					Voice_Random(ent, other, lola_random, F_NUM_LOLA_RANDOM);
+					break;
+				case BLUNT:
+					Voice_Random(ent, other, blunt_random, F_NUM_BLUNT_RANDOM);
+					break;
+				case BETH:
+					Voice_Random(ent, other, beth_random, F_NUM_BETH_RANDOM);
+					break;
+				default:
 					Voice_Random(ent, other, f_profanity_level2, F_NUM_PROFANITY_LEVEL2);
 			}
-			else	// profanity 3
-			{
-				if (ent->gender == GENDER_MALE)
-					Voice_Random(ent, other, player_profanity_level3, NUM_PLAYER_PROFANITY_LEVEL3);
-				else if (ent->gender == GENDER_FEMALE)
-					Voice_Random(ent, other, f_profanity_level3, F_NUM_PROFANITY_LEVEL3);
-			}
 		}
-		else	// stay here/moving out
-		{
-			if (strstr(cmd, "key3"))
-			{		// hold
-				if (ent->gender == GENDER_MALE)
-					Voice_Random(ent, other, holdposition, NUM_HOLDPOSITION);
-				else if (ent->gender == GENDER_FEMALE)
-//					Voice_Random(ent, other, f_holdposition, F_NUM_HOLDPOSITION);
-					Voice_Random(ent, other, rc_f_profanity_level1, 5);
-			}
-			else if (strstr(cmd, "key2"))	// lets go
-			{
-				if (ent->gender == GENDER_MALE)
-					Voice_Random(ent, other, followme, NUM_FOLLOWME);
-				else if (ent->gender == GENDER_FEMALE)
-//					Voice_Random(ent, other, f_followme, F_NUM_FOLLOWME);
-					Voice_Random(ent, other, rc_lola, 7);
-			}
-			else // converse
-			{
-				if (ent->gender == GENDER_MALE)
-				{
-					if (other->gender == GENDER_FEMALE)
-						Voice_Random(ent, other, f_neutral_talk_player, F_NUM_NEUTRAL_TALK_PLAYER);
-					else
-						Voice_Random(ent, other, neutral_talk_player, NUM_NEUTRAL_TALK_PLAYER);
-				}
-				else if (ent->gender == GENDER_FEMALE)
-				{
-					Voice_Random(ent, other, f_neutral_talk, F_NUM_NEUTRAL_TALK);
-				}
-			}
-		}
-*/
 	}
-/*
-	if (ent->client->anim_priority > ANIM_WAVE)
-		return;
-
-	ent->client->anim_priority = ANIM_WAVE;
-
-	rnd = rand() % 3;
-
-	switch (rnd)
-	{
-	case 0:
-//		cprintf (ent, PRINT_HIGH, "flipoff\n");
-		ent->s.frame = FRAME_tg_bird_01-1;
-		ent->client->anim_end = FRAME_tg_bird_10;
-		break;
-	case 1:
-//		cprintf (ent, PRINT_HIGH, "salute\n");
-		ent->s.frame = FRAME_tg_crch_grab_01-1;
-		ent->client->anim_end = FRAME_tg_crch_grab_16;
-		break;
-	case 2:
-//		cprintf (ent, PRINT_HIGH, "taunt\n");
-		ent->s.frame = FRAME_tg_chin_flip_01-1;
-		ent->client->anim_end = FRAME_tg_chin_flip_15;
-		break;
-	}
-*/
 }
 
 
@@ -3768,6 +3775,8 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 //	char	*ip;
 
 	if (gi.argc () < 2 && !arg0)
+		return;
+	if (!gi.argv(1) || !*gi.argv(1)) //dont print empty chat
 		return;
 #if 0
 	// don't let us talk if we were just kicked
@@ -3990,6 +3999,29 @@ void Cmd_PrintSettings_f (edict_t *ent)
 			cprintf(ent, PRINT_HIGH,"Current admin   : none\n\n");
 	}
 }
+void Cmd_CurseList_f (edict_t *ent)
+{
+	if(disable_curse)
+	{
+		cprintf(ent, PRINT_HIGH,"Player taunts are disabled!\n");
+		return;
+	}
+	cprintf(ent, PRINT_HIGH,"\nList of Curse Commands\n");
+	cprintf(ent, PRINT_HIGH,"=============================\n");
+	cprintf(ent, PRINT_HIGH,"MALE       FEMALE      RANDOM\n");
+	cprintf(ent, PRINT_HIGH,"=============================\n");
+	cprintf(ent, PRINT_HIGH,"KINGPIN    BAMBI       CURSE\n");
+	cprintf(ent, PRINT_HIGH,"LEROY      YOLANDA     TAUNT\n");
+	cprintf(ent, PRINT_HIGH,"MJ         MONA\n");
+	cprintf(ent, PRINT_HIGH,"MOMO       LOLA\n");
+	cprintf(ent, PRINT_HIGH,"LAMONT     BLUNT\n");
+	cprintf(ent, PRINT_HIGH,"JESUS      BETH\n");
+	cprintf(ent, PRINT_HIGH,"TYRONE\n");
+	cprintf(ent, PRINT_HIGH,"WILLY\n");
+	cprintf(ent, PRINT_HIGH,"MOKER\n");
+	cprintf(ent, PRINT_HIGH,"HEILMAN\n");
+}
+
 
 void Cmd_CommandList_f (edict_t *ent)
 {
@@ -4008,7 +4040,7 @@ void Cmd_CommandList_f (edict_t *ent)
 	} else
 		cprintf(ent, PRINT_HIGH,"resetserver, changemap, maplist\n");
 	cprintf(ent, PRINT_HIGH,"settimelimit, setfraglimit, setcashlimit\n");
-	cprintf(ent, PRINT_HIGH,"team1name, team2name, clearme\n");
+	cprintf(ent, PRINT_HIGH,"team1name, team2name, clearme, curselist\n");
 	if (enable_password) cprintf(ent, PRINT_HIGH,"setpassword removepassword\n");
 	if (!fixed_gametype) {
 		cprintf(ent, PRINT_HIGH,"setdmflags, setdm_realmode, setteamplay\n");
@@ -4431,6 +4463,32 @@ void Cmd_SetTeamName_f (edict_t *ent, int team, char *name)
 	if (ent->client->pers.admin > NOT_ADMIN ) { 
 		if (strlen(name)<16 && name[0]!=' ') 
 		{
+			if(memalloced[team])
+				free(team_names[team]);
+
+			team_names[team] = (char *)malloc(16);
+			if(team_names[team]==NULL)
+				cprintf(ent, PRINT_HIGH,"Insufficient memory available\n" );
+			else
+			{
+				memalloced[team] = 1;
+				sprintf(team_names[team], "%s", name);
+			}
+		}
+		else 
+			cprintf(ent,PRINT_HIGH,"Team name can't be bigger than 15 letters\nand/or can't start with whitespace character!\n"); 
+	} 
+	else 
+		cprintf(ent,PRINT_HIGH,"You do not have admin\n"); 
+} 
+
+/*
+void Cmd_SetTeamName_f (edict_t *ent, int team, char *name) 
+{ 
+	if (!name || !*name) return; 
+	if (ent->client->pers.admin > NOT_ADMIN ) { 
+		if (strlen(name)<16 && name[0]!=' ') 
+		{
 			team_names[team] = (char *)malloc(16);
 			sprintf(team_names[team], "%s", name);
 		}
@@ -4440,7 +4498,7 @@ void Cmd_SetTeamName_f (edict_t *ent, int team, char *name)
 	else 
 		cprintf(ent,PRINT_HIGH,"You do not have admin\n"); 
 } 
-
+*/
 //===================================================================================
 //===================================================================================
 
@@ -5034,9 +5092,7 @@ void ClientCommand (edict_t *ent)
 		Cmd_Kill_f (ent);
 	else if (Q_stricmp (cmd, "putaway") == 0)
 		Cmd_PutAway_f (ent);
-//	else if (Q_stricmp (cmd, "wave") == 0)
-//		Cmd_Wave_f (ent);
-// BEGIN:	Xatrix/Ridah/Navigator/23-mar-1998
+	// BEGIN:	Xatrix/Ridah/Navigator/23-mar-1998
 	else if (Q_stricmp (cmd, "nav_debug_dest") == 0)
 		Cmd_NavDebugDest_f (ent);
 	else if (Q_stricmp (cmd, "nav_debug_showpath") == 0)
@@ -5056,7 +5112,7 @@ void ClientCommand (edict_t *ent)
 
 	// Ridah, new 3 key command system
 	else if (strstr (cmd, "key") == cmd)
-		Cmd_Key_f (ent);
+		Cmd_Key_f (ent,0);
 
 	// Ridah, Chasecam
 	else if (Q_stricmp (cmd, "togglecam") == 0)
@@ -5157,22 +5213,50 @@ void ClientCommand (edict_t *ent)
 		Cmd_SetTeamName_f(ent,1,gi.argv(1)); 
 	else if (Q_stricmp (cmd, "team2name") == 0) 
 		Cmd_SetTeamName_f(ent,2,gi.argv(1)); 
-/*
-	else if (Q_stricmp (cmd, "spawn") == 0) {
-		int s=atoi(gi.argv(1));
-		edict_t	*spot=NULL;
-		while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-			if (!s) {
-				gi.cprintf(ent,PRINT_HIGH,"%f %f %f (%d)\n",spot->s.origin[0],spot->s.origin[1],spot->s.origin[2],spot->style);
-				VectorCopy (spot->s.origin, ent->s.origin);
-				break;
-			}
-			s--;
-		}
-	}
-*/
+
+	//taunt commands
+	else if (Q_stricmp (cmd, "kingpin") == 0) 
+		Cmd_Key_f(ent,KINGPIN); 
+	else if (Q_stricmp (cmd, "leroy") == 0) 
+		Cmd_Key_f(ent,LEROY); 
+	else if (Q_stricmp (cmd, "mj") == 0) 
+		Cmd_Key_f(ent,MJ); 
+	else if (Q_stricmp (cmd, "momo") == 0) 
+		Cmd_Key_f(ent,MOMO); 
+	else if (Q_stricmp (cmd, "lamont") == 0) 
+		Cmd_Key_f(ent,LAMONT); 
+	else if (Q_stricmp (cmd, "jesus") == 0) 
+		Cmd_Key_f(ent,JESUS); 
+	else if (Q_stricmp (cmd, "tyrone") == 0) 
+		Cmd_Key_f(ent,TYRONE); 
+	else if (Q_stricmp (cmd, "willy") == 0) 
+		Cmd_Key_f(ent,WILLY); 
+	else if (Q_stricmp (cmd, "moker") == 0) 
+		Cmd_Key_f(ent,MOKER); 
+	else if (Q_stricmp (cmd, "heilman") == 0) 
+		Cmd_Key_f(ent,HEILMAN); 
+	else if (Q_stricmp (cmd, "bambi") == 0) 
+		Cmd_Key_f(ent,BAMBI); 
+	else if (Q_stricmp (cmd, "yolanda") == 0) 
+		Cmd_Key_f(ent,YOLANDA); 
+	else if (Q_stricmp (cmd, "lola") == 0) 
+		Cmd_Key_f(ent,LOLA); 
+	else if (Q_stricmp (cmd, "mona") == 0) 
+		Cmd_Key_f(ent,MONA); 
+	else if (Q_stricmp (cmd, "blunt") == 0) 
+		Cmd_Key_f(ent,BLUNT); 
+	else if (Q_stricmp (cmd, "beth") == 0) 
+		Cmd_Key_f(ent,BETH); 
+	else if (Q_stricmp (cmd, "curselist") == 0) 
+		Cmd_CurseList_f(ent); 
+
 	else if (strstr (cmd, "curse") == cmd)
-		Cmd_Key_f (ent);
+		Cmd_Key_f (ent,0);
+	else if (strstr (cmd, "taunt") == cmd)
+		Cmd_Key_f (ent,0);
+
+
+	//end -taunts tical
 
 	else if (teamplay->value)
 	{
@@ -5189,10 +5273,11 @@ void ClientCommand (edict_t *ent)
 
 		else	// anything that doesn't match a command will be a chat
 		    Cmd_Say_f (ent, false, true);
-
+			//cprintf(ent,PRINT_HIGH,"Unknown command!\n");
 	}
 
 	else	// anything that doesn't match a command will be a chat
 	    Cmd_Say_f (ent, false, true);
+		//cprintf(ent,PRINT_HIGH,"Unknown command!\n");
 
 }

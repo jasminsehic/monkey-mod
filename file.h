@@ -24,6 +24,7 @@
 #define		DISABLE_ANON_TEXT_STRING	"disable_anon_text"
 #define		KICK_DIRTY_STRING		"kick_dirty"
 #define		DISABLE_CURSE_STRING	"disable_curse"
+#define		ENABLE_SEE_KILLER_HEALTH_STRING	"enable_killerhealth"
 
 #define		MAX_STRING_LENGTH	100
 #define		FILE_OPEN_ERROR		0
@@ -60,6 +61,7 @@
 #define		DISABLE_ANON_TEXT_KEYWORD	25
 #define		KICK_DIRTY_KEYWORD			27
 #define		DISABLE_CURSE_KEYWORD		28
+#define		ENABLE_SEE_KILLER_HEALTH_KEYWORD 29
 
 #define		STANDBY					0
 #define		ADD_CUSTOM				1

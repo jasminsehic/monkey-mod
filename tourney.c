@@ -32,6 +32,7 @@ int default_random_map;
 int disable_anon_text;
 int kick_dirty;
 int disable_curse;
+int enable_killerhealth;
 
 MOTD_t	MOTD[20];
 
@@ -106,6 +107,7 @@ void MatchSetup () // Places the server in prematch mode
 	gi.bprintf(PRINT_HIGH,"Players need to join the correct teams.\n");
 	
 }
+int memalloced[3] = {0,0,0};
 
 void ResetServer () // completely resets the server including map
 {
@@ -119,6 +121,7 @@ void ResetServer () // completely resets the server including map
 	gi.cvar_set("cashlimit",default_cashlimit);
 	gi.cvar_set("dm_realmode",default_dm_realmode);
 	gi.cvar_set("cheats","0");
+	memalloced[1]=0;memalloced[2]=0;
 
 	if (default_random_map && num_custom_maps)
 		Com_sprintf (command, sizeof(command), "map \"%s\"\n", custom_list[rand()%num_custom_maps].custom_map);

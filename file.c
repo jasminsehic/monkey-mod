@@ -115,6 +115,9 @@ int proccess_line(char*	buffer)
 	if (strstr(buffer, DISABLE_CURSE_STRING))
 		return DISABLE_CURSE_KEYWORD;
 
+	if (strstr(buffer, ENABLE_SEE_KILLER_HEALTH_STRING))
+		return ENABLE_SEE_KILLER_HEALTH_KEYWORD;
+
 	return FOUND_STRING;
 
 }
@@ -159,6 +162,8 @@ int proccess_ini_file()
 	disable_anon_text = false;
 	kick_dirty = false;
 	disable_curse = false;
+	enable_killerhealth = false;
+
 
 	// Open config file
 	game_dir = gi.cvar("game", "", 0);
@@ -277,6 +282,9 @@ int proccess_ini_file()
 			break;
 		case DISABLE_CURSE_KEYWORD:
 			disable_curse = true;
+			break;
+		case ENABLE_SEE_KILLER_HEALTH_KEYWORD:
+			enable_killerhealth = true;
 			break;
 		
 		default:	// wtf is this?

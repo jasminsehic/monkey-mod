@@ -83,7 +83,7 @@
 #define PLAYING				0
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Monkey CDS v1.40a"
+#define	GAMEVERSION	"Monkey CDS v1.40b"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -1124,7 +1124,7 @@ void fire_rat (edict_t *self, vec3_t start, vec3_t forward, int damage);
 // g_client.c
 //
 void respawn (edict_t *ent);
-void BeginIntermission (edict_t *targ);
+void BeginIntermission (edict_t *targ, char *changenext);
 void PutClientInServer (edict_t *ent);
 void InitClientPersistant (gclient_t *client);
 void InitClientResp (gclient_t *client);
@@ -1950,6 +1950,7 @@ extern int default_random_map;
 extern int disable_anon_text;
 extern int kick_dirty;
 extern int disable_curse;
+extern int enable_killerhealth;
 
 typedef struct   // Message of the Day
 {

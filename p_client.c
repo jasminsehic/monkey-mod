@@ -243,9 +243,9 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 
 		// in realmode, track deaths
 /*		if (dm_realmode->value && !teamplay->value)
-			self->client->resp.deposited++;
-		if (teamplay->value==4)
 			self->client->resp.deposited++;*/
+		if (deathmatch->value==1 && teamplay->value!=4 && teamplay->value!=1)
+			self->client->resp.deposited++;
 		if (mod!=MOD_RESTART && mod!=MOD_TELEFRAG && (teamplay->value==4
 			|| (dm_realmode->value && !teamplay->value)))
 			self->client->resp.deposited++;
@@ -597,12 +597,15 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 
 		self->client->ps.pmove.pm_type = PM_DEAD;
 		ClientObituary (self, inflictor, attacker);
-
-		if(attacker->client && attacker!=self)
+		
+		if (enable_killerhealth)
 		{
-			health = attacker->health;
-			if(((unsigned int)attacker->health>100)||((unsigned int)attacker->health<0)) health=0;
-			cprintf(self,PRINT_CHAT,"%s had %u health!\n", attacker->client->pers.netname, health);
+			if(attacker->client && attacker!=self)
+			{
+				health = attacker->health;
+				if(((unsigned int)attacker->health>100)||((unsigned int)attacker->health<0)) health=0;
+				cprintf(self,PRINT_CHAT,"%s had %u health!\n", attacker->client->pers.netname, health);
+			}
 		}
 //		sl_WriteStdLogDeath( &gi, level, self, inflictor, attacker);	// Standard Logging
 
@@ -2615,6 +2618,7 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 {
 	char	*value, *skinvalue; //*command;
 	int		i;
+	edict_t	*doot; int j;
 
 	ent->client = NULL;
 	ent->inuse = false;
@@ -2684,7 +2688,22 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	ClientUserinfoChanged (ent, userinfo);
 
 	if (game.maxclients > 1)
+	{
 		gi.dprintf ("%s (%s) connected\n", ent->client->pers.netname,ent->client->pers.ip);
+		
+		for_each_player (doot,j)
+		{
+			if (!(doot->inuse))
+				continue;
+			if (!(doot->client))
+				continue;
+			if (doot->client->pers.admin == ADMIN)
+			{
+				gi.cprintf(doot, PRINT_CHAT, "%s (%s) connected\n", ent->client->pers.netname,ent->client->pers.ip);
+				break;
+			}
+		}
+	}
 
 	// Ridah, make sure they have to join a team
 

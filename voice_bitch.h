@@ -90,7 +90,25 @@ extern voice_table_t hiredgal_ask[];
 extern voice_table_t sy_selma[];
 extern voice_table_t sy_jane[];
 
+//TiCaL
+#define F_NUM_YOLANDA_RANDOM 7
+extern voice_table_t yolanda_random[];
 
+#define F_NUM_MONA_RANDOM 11
+extern voice_table_t mona_random[];
+
+#define F_NUM_LOLA_RANDOM 7
+extern voice_table_t lola_random[];
+
+#define F_NUM_BLUNT_RANDOM 17
+extern voice_table_t blunt_random[];
+
+#define F_NUM_BETH_RANDOM 3
+extern voice_table_t beth_random[];
+
+#define F_NUM_BAMBI_RANDOM 3
+extern voice_table_t bambi_random[];
+//tical
 /////////////////////////////////////////////////
 // radio city voice files
 /////////////////////////////////////////////////

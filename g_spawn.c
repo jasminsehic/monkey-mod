@@ -1998,79 +1998,82 @@ void SP_worldspawn (edict_t *ent)
 	// 63 testing
 	gi.configstring(CS_LIGHTS+63, "a");
 	
-	//tical - caching the custom maps levelshots
-	i = 0;
-	found = false;
-	while ((!found) && (i < (num_custom_maps - 1) )) 
-	{	
-		if (Q_stricmp (custom_list[i].custom_map,level.mapname) == 0)
-		{
-			vote_set[1] = i+1;
-			found = true;
-		}
-		i++;
-	}
-	if (!found)
-		vote_set[1] = 0;
-
-	if (num_custom_maps < 9) // less than 9 maps found, just display them all
+	if(allow_map_voting && custom_map_filename[0]!=0)
 	{
-		i = vote_set[1];
-		for (j=2; j< (num_custom_maps+2); j++)
-		{
-			i++;
-			if (i == num_custom_maps)
-				i=0;
-			vote_set[j] = i;
-		}
-		return;
-	}
-	// first map is always the next in the rotations
-	srand((unsigned int)time((time_t *)NULL));
-
-	for (i=2; i < 6; i++) // 2-5 are weighted by rank
-	{
-		unique = false;
-		while (!unique)
-		{		
-			selection = rand() % total_rank;
-			j=0;
-			while (selection >= 0)
+		//tical - caching the custom maps levelshots
+		i = 0;
+		found = false;
+		while ((!found) && (i < (num_custom_maps - 1) )) 
+		{	
+			if (Q_stricmp (custom_list[i].custom_map,level.mapname) == 0)
 			{
-				selection -= custom_list[j].rank;
-				j++;
+				vote_set[1] = i+1;
+				found = true;
 			}
-			vote_set[i] = (j-1);
-			unique = true;
-			for (k=0; k < i; k++)
-				if (vote_set[i] == vote_set[k])
-					unique = false;
+			i++;
 		}
-	}
-
-	for (i=6; i < 9; i++) // 6-8 are just picked at random
-	{
-		unique = false;
-		while (!unique)
-		{		
-			selection = rand() % num_custom_maps;
-			vote_set[i] = selection;
-			unique = true;
-			for (k=0; k < i; k++)
-				if (vote_set[i] == vote_set[k])
-					unique = false;
+		if (!found)
+			vote_set[1] = 0;
+		
+		if (num_custom_maps < 9) // less than 9 maps found, just display them all
+		{
+			i = vote_set[1];
+			for (j=2; j< (num_custom_maps+2); j++)
+			{
+				i++;
+				if (i == num_custom_maps)
+					i=0;
+				vote_set[j] = i;
+			}
+			return;
 		}
+		// first map is always the next in the rotations
+		srand((unsigned int)time((time_t *)NULL));
+		
+		for (i=2; i < 6; i++) // 2-5 are weighted by rank
+		{
+			unique = false;
+			while (!unique)
+			{		
+				selection = rand() % total_rank;
+				j=0;
+				while (selection >= 0)
+				{
+					selection -= custom_list[j].rank;
+					j++;
+				}
+				vote_set[i] = (j-1);
+				unique = true;
+				for (k=0; k < i; k++)
+					if (vote_set[i] == vote_set[k])
+						unique = false;
+			}
+		}
+		
+		for (i=6; i < 9; i++) // 6-8 are just picked at random
+		{
+			unique = false;
+			while (!unique)
+			{		
+				selection = rand() % num_custom_maps;
+				vote_set[i] = selection;
+				unique = true;
+				for (k=0; k < i; k++)
+					if (vote_set[i] == vote_set[k])
+						unique = false;
+			}
+		}
+		if (num_custom_maps < 8 )
+			maps = num_custom_maps;
+		else
+			maps = 8;
+		
+		for(i=1; i<=maps; i++)
+		{
+			sprintf(mappic,"pics/%s.pcx",custom_list[vote_set[i]].custom_map);
+			gi.imageindex (mappic);
+		}
+		//end tical
 	}
-	if (num_custom_maps < 8 )
-		maps = num_custom_maps;
-	else
-		maps = 8;
-	
-	for(i=1; i<=maps; i++)
-	{
-		sprintf(mappic,"pics/%s.pcx",custom_list[vote_set[i]].custom_map);
-		gi.imageindex (mappic);
-	}
-	//end tical
 }
 
