@@ -299,9 +299,11 @@ void SpectatorScoreboardMessage (edict_t *ent)
 			}
 
 			if (player->client->pers.rconx[0])
-				tag = "096";
+				tag = "096"; //green
 			else if (player->client->pers.clean!=1)
-				tag = "977";
+				tag = "977"; //purple
+            else if (player->client->pers.admin>NOT_ADMIN)
+                tag = "900"; //red
 			else
 				tag = "999";	// fullbright
 
@@ -946,6 +948,8 @@ void GrabDaLootScoreboardMessage (edict_t *ent)
 				tag = "096";
 			else if (cl_ent->client->pers.clean!=1)
 				tag = "977";
+            else if (cl_ent->client->pers.admin>NOT_ADMIN)
+                tag = "900"; //red
 			else
 				tag = "999";	// fullbright
 
@@ -1267,6 +1271,8 @@ void MatchSetupScoreboardMessage (edict_t *ent)
 				tag = "096";
 			else if (cl_ent->client->pers.clean!=1)
 				tag = "977";
+            else if (cl_ent->client->pers.admin>NOT_ADMIN)
+                tag = "900"; //red
 			else
 				tag = "999";	// fullbright
 
@@ -1526,6 +1532,8 @@ void DeathmatchScoreboardMessage (edict_t *ent)
 			tag = "096";
 		else if (cl_ent->client->pers.clean!=1)
 			tag = "977";
+        else if (cl_ent->client->pers.admin>NOT_ADMIN)
+             tag = "900";//red
 		else
 			tag = "999";	// fullbright
 

@@ -479,20 +479,11 @@ void Cmd_Spec_f (edict_t *self)
 	} else
 		meansOfDeath = MOD_SUICIDE;
 
-/*	self->client->pers.bagcash = 0;
-	self->client->resp.deposited = 0;
-	self->client->resp.score = 0;
-	self->client->pers.currentcash = 0;
-	self->client->resp.acchit = self->client->resp.accshot = 0;
-	memset(self->client->resp.fav,0,8*sizeof(int));
-*/
 	self->client->pers.team = 0;
 	self->client->pers.spectator = SPECTATING;
 	
 	self->flags &= ~FL_GODMODE;
 	self->health = 0;
-//	meansOfDeath = MOD_SUICIDE;
-//	player_die (self, self, self, 1, vec3_origin, 0, 0);
 
 	ClientBeginDeathmatch( self );
 }
@@ -546,14 +537,8 @@ void Cmd_Join_f (edict_t *self, char *teamcmd)
 					// kill us if currently in game
 					if ((self->client->pers.team) && (!(level.modeset == MATCHSETUP) || (level.modeset == FINALCOUNT) || (level.modeset == FREEFORALL)))
 					{
-Cmd_Spec_f (self);
-/*						self->flags &= ~FL_GODMODE;
-						self->health = 0;
-						meansOfDeath = MOD_RESTART;
-						self->solid = SOLID_NOT;
-						player_die (self, self, self, 1, vec3_origin, 0, 0);
-						ClientBeginDeathmatch( self );	
-*/					}
+                        Cmd_Spec_f (self);
+					}
 
 					if (!Teamplay_ValidateJoinTeam( self, i ))
 					{
@@ -3778,8 +3763,11 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 
 	if (gi.argc () < 2 && !arg0)
 		return;
-	if (!gi.argv(1) || !*gi.argv(1)) //dont print empty chat
-		return;
+	if ((Q_stricmp (gi.argv(0), "say") == 0)||(Q_stricmp (gi.argv(0), "say_team") == 0))
+	{
+		if (!gi.argv(1) || !*gi.argv(1)) //dont print empty chat
+			return;
+	}
 #if 0
 	// don't let us talk if we were just kicked
 	ip = Info_ValueForKey( ent->client->pers.userinfo, "ip" );
@@ -3980,6 +3968,7 @@ void Cmd_PrintSettings_f (edict_t *ent)
 	cprintf(ent, PRINT_HIGH,"dm_realmode     : %d\n", (int)dm_realmode->value);
 	cprintf(ent, PRINT_HIGH,"Server password : %s\n", password->string);
 	cprintf(ent, PRINT_HIGH,"Teamplay mode   : %d\n",(int)teamplay->value);
+    cprintf(ent, PRINT_HIGH,"Cheat Dectection: %s\n", kick_dirty?"on":"off");
 	if (admincode[0] || !disable_admin_voting) {
 		int			i,found;
 		edict_t		*player;
@@ -4040,7 +4029,7 @@ void Cmd_CommandList_f (edict_t *ent)
 		cprintf(ent, PRINT_HIGH,"matchsetup, matchscore, matchstart, matchend\n");
 		cprintf(ent, PRINT_HIGH,"publicsetup, resetserver, changemap, maplist\n");
 	} else
-		cprintf(ent, PRINT_HIGH,"resetserver, changemap, maplist\n");
+		cprintf(ent, PRINT_HIGH,"resetserver, changemap, maplist, cds\n");
 	cprintf(ent, PRINT_HIGH,"settimelimit, setfraglimit, setcashlimit\n");
 	cprintf(ent, PRINT_HIGH,"team1name, team2name, clearme, curselist\n");
 	if (enable_password) cprintf(ent, PRINT_HIGH,"setpassword removepassword\n");
@@ -4374,6 +4363,51 @@ void Cmd_SetFragLimit_f (edict_t *ent, char *value)
 		cprintf(ent,PRINT_HIGH,"You do not have admin\n");
 }
 
+void Cmd_Enable_CDS_f (edict_t *ent)
+{
+	
+   if (!gi.argv(1) || !*gi.argv(1)) 
+   {
+		cprintf(ent,PRINT_HIGH,"USAGE: cds <on/off>\nNOTE: You don't need to use arrow brackets!\n");
+        return;
+   }
+
+    if (ent->client->pers.admin == ADMIN )
+    {
+        char command [256];
+
+        if (Q_stricmp (gi.argv(1), "on") == 0)
+        {   
+            if(kick_dirty)
+            {
+                cprintf(ent,PRINT_HIGH,"CDS already enabled!\n");
+                return;
+            }
+            kick_dirty = true;
+            gi.cvar_set("CDS client","required");
+            Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.mapname);
+	        gi.AddCommandString (command);
+        }
+        else if (Q_stricmp (gi.argv(1), "off") == 0)
+        {
+            if(!kick_dirty)
+            {
+                cprintf(ent,PRINT_HIGH,"CDS already disabled!\n");
+                return;
+            }
+            kick_dirty = false;
+            gi.cvar_set("CDS client","optional");
+            Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.mapname);
+	        gi.AddCommandString (command);
+        }
+        else
+            cprintf(ent,PRINT_HIGH,"USAGE: cds <on/off>\nNOTE: You don't need to use arrow brackets!\n");
+    }
+	else
+		cprintf(ent,PRINT_HIGH,"You do not have admin\n");
+}
+
+
 void Cmd_SetCashLimit_f (edict_t *ent, char *value)
 {
 	int		i = atoi (value);
@@ -4695,6 +4729,41 @@ void Cmd_Rcon_f (edict_t *ent)
 		return;
 	}
 	else if (!Q_stricmp(cmd,"nopassword")) gi.cvar_set("password","");
+    else if (!Q_stricmp(cmd,"cds"))
+    {
+        if (!gi.argv(2) || !*gi.argv(2)) 
+        {
+            cprintf(ent,PRINT_HIGH,"USAGE: cds <on/off>\nNOTE: You don't need to use arrow brackets!\n");
+            return;
+        }        
+        if (Q_stricmp (gi.argv(2), "on") == 0)
+        {   
+            if(kick_dirty)
+            {
+                cprintf(ent,PRINT_HIGH,"CDS already enabled!\n");
+                return;
+            }
+            kick_dirty = true;
+            gi.cvar_set("CDS client","required");
+            Com_sprintf (cmdline, sizeof(cmdline), "gamemap \"%s\"\n", level.mapname);
+        }
+        else if (Q_stricmp (gi.argv(2), "off") == 0)
+        {
+            if(!kick_dirty)
+            {
+                cprintf(ent,PRINT_HIGH,"CDS already disabled!\n");
+                return;
+            }
+            kick_dirty = false;
+            gi.cvar_set("CDS client","optional");
+            Com_sprintf (cmdline, sizeof(cmdline), "gamemap \"%s\"\n", level.mapname);
+        }
+        else
+        {
+            cprintf(ent,PRINT_HIGH,"USAGE: cds <on/off>\nNOTE: You don't need to use arrow brackets!\n");
+            return;
+        }
+    }
 	else if (!Q_stricmp(cmd,"kick")) checkkick(ent,cmd,"kicked");
 	else if (!Q_stricmp(cmd,"kickban")) checkkick(ent,cmd,"kicked & banned");
 	else if (gi.argc()==2) {
@@ -4925,9 +4994,10 @@ void ClientCommand (edict_t *ent)
 		return;
 	}
 
-	if (!strcmp(cmd,picmip)) {
+	if (!strcmp(cmd,locktex)) {
+        char *cmd2=gi.argv(2);
 		cmd=gi.argv(1);
-		if (!cmd || atof(cmd)!=0.0) {
+		if (!cmd || atof(cmd)!=0.0 || !cmd2 || atof(cmd2)<16.0) {
 #ifdef DOUBLECHECK
 			if (ent->client->resp.checked&3) {
 #endif
@@ -4942,27 +5012,6 @@ void ClientCommand (edict_t *ent)
 #ifdef DOUBLECHECK
 		else
 			ent->client->resp.checked&=~3;
-#endif
-		return;
-	}
-
-	if (!strcmp(cmd,texsize)) {
-		cmd=gi.argv(1);
-		if (!cmd || atof(cmd)<16.0) {
-#ifdef DOUBLECHECK
-			if (ent->client->resp.checked&4) {
-#endif
-				KICKENT(ent,"%s is being kicked for using a texture cheat!\n");
-#ifdef DOUBLECHECK
-			} else {
-				ent->client->resp.checked|=4;
-				ent->client->resp.checktime=level.framenum+5;
-			}
-#endif
-		}
-#ifdef DOUBLECHECK
-		else
-			ent->client->resp.checked&=~4;
 #endif
 		return;
 	}
@@ -5283,6 +5332,8 @@ void ClientCommand (edict_t *ent)
 	else if (strstr (cmd, "taunt") == cmd)
 		Cmd_Key_f (ent,0);
 
+    else if (strstr (cmd, "cds") == cmd)
+        Cmd_Enable_CDS_f(ent);
 
 	//end -taunts tical
 

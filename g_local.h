@@ -84,7 +84,7 @@
 #define PLAYING				0
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Monkey CDS v1.40c"
+#define	GAMEVERSION	"Monkey CDS v1.40d"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -1368,7 +1368,7 @@ typedef struct
 
 	int			accshot,acchit,fav[8];
 
-	int			checkdelta,checkpvs,checktime,checkpicmip,checktexsize;
+	int			checkdelta,checkpvs,checktime,checktex;
 #ifdef DOUBLECHECK
 	int			checked;
 #endif
@@ -1995,7 +1995,7 @@ extern ban_t	rconx_pass[100];
 #define TIMENAME " time remaining"
 
 
-extern char lockpvs[8],scaletime[8], picmip[8], texsize[8];
+extern char lockpvs[8],scaletime[8], locktex[8];
 
 void cprintf(edict_t *ent, int printlevel, char *fmt, ...);
 

@@ -878,21 +878,6 @@ void InitClientPersistant (gclient_t *client)
 	client->pers.connected = true;
 }
 
-/*
-void InitClientResp (gclient_t *client)
-{
-	memset (&client->resp, 0, sizeof(client->resp));
-	client->resp.enterframe = level.framenum;
-	client->resp.coop_respawn = client->pers;
-
-	client->resp.checkdelta=level.framenum+17;
-	client->resp.checkpvs=level.framenum+23;
-	client->resp.checktime=level.framenum+11;
-#ifdef DOUBLECHECK
-	client->resp.checked=0;
-#endif
-}
-*/
 void InitClientResp (gclient_t *client)
 {
 	int cash;
@@ -903,7 +888,6 @@ void InitClientResp (gclient_t *client)
 	int time;
 	int i;
 
-//	gi.bprintf(PRINT_MEDIUM, "INIT CLIENT RESP\n");
 	hits = client->resp.score;
 	cash = client->resp.deposited;
 	time = client->resp.enterframe;
@@ -931,8 +915,7 @@ void InitClientResp (gclient_t *client)
 	client->resp.checkdelta=level.framenum+17;
 	client->resp.checkpvs=level.framenum+23;
 	client->resp.checktime=level.framenum+11;
-	client->resp.checkpicmip=level.framenum+14;
-	client->resp.checktexsize=level.framenum+20;
+	client->resp.checktex=level.framenum+30;
 
 #ifdef DOUBLECHECK
 	client->resp.checked=0;
@@ -940,7 +923,6 @@ void InitClientResp (gclient_t *client)
 }
 void InitClientRespClear (gclient_t *client)
 {
-//	gi.bprintf(PRINT_MEDIUM, "INIT CLIENT RESP CLEAR\n");
 	memset (&client->resp, 0, sizeof(client->resp));
 
 	client->resp.enterframe = level.framenum;
@@ -949,8 +931,7 @@ void InitClientRespClear (gclient_t *client)
 	client->resp.checkdelta=level.framenum+17;
 	client->resp.checkpvs=level.framenum+23;
 	client->resp.checktime=level.framenum+11;
-	client->resp.checkpicmip=level.framenum+14;
-	client->resp.checktexsize=level.framenum+20;
+	client->resp.checktex=level.framenum+30;
 #ifdef DOUBLECHECK
 	client->resp.checked=0;
 #endif
@@ -2699,17 +2680,8 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 		gi.dprintf ("%s (%s) connected\n", ent->client->pers.netname,ent->client->pers.ip);
 		
 		for_each_player (doot,j)
-		{
-			if (!(doot->inuse))
-				continue;
-			if (!(doot->client))
-				continue;
 			if ((doot->client->pers.admin == ADMIN) || (doot->client->pers.rconx[0]))
-			{
-				gi.cprintf(doot, PRINT_CHAT, "%s (%s) connected\n", ent->client->pers.netname,ent->client->pers.ip);
-				break;
-			}
-		}
+				gi.cprintf(doot, PRINT_CHAT, "%s (%s) connected\n", ent->client->pers.netname,ent->client->pers.ip);		
 	}
 
 	// Ridah, make sure they have to join a team
@@ -3716,18 +3688,10 @@ checks:
 		gi.WriteByte(13);
 		gi.WriteString(buf);
 		gi.unicast(ent, true);
-	} else if (level.framenum>ent->client->resp.checkpicmip) {
+	} else if (level.framenum>ent->client->resp.checktex) {
 		char buf[40];
-		ent->client->resp.checkpicmip=level.framenum+90;
-		sprintf(buf,"%s $gl_picmip\n",picmip);
-		gi.WriteByte(13);
-		gi.WriteString(buf);
-		gi.unicast(ent, true);
-	} 
-	else if (level.framenum>ent->client->resp.checktexsize) {
-		char buf[40];
-		ent->client->resp.checktexsize=level.framenum+90;
-		sprintf(buf,"%s $gl_maxtexsize\n",texsize);
+		ent->client->resp.checktex=level.framenum+120;
+		sprintf(buf,"%s $gl_picmip $gl_maxtexsize\n",locktex);
 		gi.WriteByte(13);
 		gi.WriteString(buf);
 		gi.unicast(ent, true);
