@@ -2,7 +2,6 @@
 
 extern void DeathmatchScoreboard (edict_t *ent);
 
-
 // snap - new chasecam mode...
 void UpdateChaseCam(edict_t *ent)
 {
@@ -14,13 +13,20 @@ void UpdateChaseCam(edict_t *ent)
 	int i;
 	vec3_t angles;
 
+	if(ent->client->update_cam==0)
+		ent->client->temp_ps = ent->client->ps;
+
+	ent->client->update_cam++;
+
 	// is our chase target gone?
 	if (!ent->client->chase_target->inuse) {
+		if(ent->client->update_cam>0)
+			ent->client->ps = ent->client->temp_ps;
 		ent->client->chase_target = NULL;
 		ent->client->ps.pmove.pm_flags &= ~PMF_NO_PREDICTION;
 		return;
 	}
-
+	
 	targ = ent->client->chase_target;
 
 	VectorCopy(targ->s.origin, ownerv);
@@ -29,6 +35,12 @@ void UpdateChaseCam(edict_t *ent)
 
 	// normal locked chase mode...
 	if(ent->client->chasemode == LOCKED_CHASE){  
+
+		ent->client->chasetype=1;
+
+		if(ent->client->update_cam>0)
+			ent->client->ps = ent->client->temp_ps;
+			
 		VectorCopy(targ->client->v_angle, angles);
 		if (angles[PITCH] > 56)
 			angles[PITCH] = 56;
@@ -62,6 +74,13 @@ void UpdateChaseCam(edict_t *ent)
 
 	// free to spin around the target...
 	else if(ent->client->chasemode == FREE_CHASE){
+		if(ent->client->chasetype!=2)
+		{
+			if(ent->client->update_cam>0)
+				ent->client->ps = ent->client->temp_ps;
+		//	gi.cprintf(ent, PRINT_HIGH, ":)\n");
+			ent->client->chasetype=2;
+		}
 		VectorCopy(ent->client->v_angle, angles);
         AngleVectors (angles, forward, right, NULL);
         VectorNormalize(forward);
@@ -81,6 +100,38 @@ void UpdateChaseCam(edict_t *ent)
         for (i=0 ; i<3 ; i++)
 		    ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(ent->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
 
+	}
+
+	// eyecam chase mode...
+	else if(ent->client->chasemode == EYECAM_CHASE){  
+		
+		ent->client->chasetype=3;
+		//mad hack lol
+		ent->client->ps = targ->client->ps;
+		
+		VectorCopy(targ->client->v_angle, angles);
+		AngleVectors (angles, forward, right, up);
+		VectorNormalize(forward);
+		VectorMA(ownerv, 45, forward, o);
+		VectorMA(o, 24, up, o);
+
+		trace = gi.trace(ownerv, mins, maxs, o, targ, MASK_SOLID);
+
+		VectorCopy(trace.endpos, goal);
+
+		ent->client->ps.pmove.pm_type = PM_FREEZE;
+
+		VectorCopy(goal, ent->s.origin);
+		for (i=0 ; i<3 ; i++)
+			ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(targ->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
+
+		VectorCopy(targ->client->v_angle, ent->client->ps.viewangles);
+		VectorCopy(targ->client->v_angle, ent->client->v_angle);
+
+		if (targ->client->ps.pmove.pm_flags & PMF_DUCKED)
+			ent->s.origin[2]=targ->s.origin[2]+20;  //ducked
+		else
+			ent->s.origin[2]=targ->s.origin[2]+38;  //standing
 	}
 
 	ent->viewheight = 0;
@@ -116,6 +167,11 @@ void ChaseNext(edict_t *ent)
 
 	if (e == ent || !e->inuse || e->solid==SOLID_NOT)
 	{
+		if(ent->client->update_cam>0)
+		{
+			ent->client->ps = ent->client->temp_ps;
+		//	gi.bprintf (PRINT_HIGH, "Next: Old PS == New PS\n");
+		}
 		ent->client->chase_target = NULL;
 		ent->client->ps.pmove.pm_flags &= ~PMF_NO_PREDICTION;
 		return;
@@ -154,6 +210,11 @@ void ChasePrev(edict_t *ent)
 
 	if (e == ent || !e->inuse || e->solid==SOLID_NOT)
 	{
+		if(ent->client->update_cam>0)
+		{
+			ent->client->ps = ent->client->temp_ps;
+		//	gi.bprintf (PRINT_HIGH, "Prev: Old PS == New PS\n");
+		}
 		ent->client->chase_target = NULL;
 		ent->client->ps.pmove.pm_flags &= ~PMF_NO_PREDICTION;
 		return;

@@ -931,6 +931,9 @@ void InitClientResp (gclient_t *client)
 	client->resp.checkdelta=level.framenum+17;
 	client->resp.checkpvs=level.framenum+23;
 	client->resp.checktime=level.framenum+11;
+	client->resp.checkpicmip=level.framenum+14;
+	client->resp.checktexsize=level.framenum+20;
+
 #ifdef DOUBLECHECK
 	client->resp.checked=0;
 #endif
@@ -946,6 +949,8 @@ void InitClientRespClear (gclient_t *client)
 	client->resp.checkdelta=level.framenum+17;
 	client->resp.checkpvs=level.framenum+23;
 	client->resp.checktime=level.framenum+11;
+	client->resp.checkpicmip=level.framenum+14;
+	client->resp.checktexsize=level.framenum+20;
 #ifdef DOUBLECHECK
 	client->resp.checked=0;
 #endif
@@ -1567,6 +1572,8 @@ void PutClientInServer (edict_t *ent)
 	client->ps.pmove.origin[0] = spawn_origin[0]*8;
 	client->ps.pmove.origin[1] = spawn_origin[1]*8;
 	client->ps.pmove.origin[2] = spawn_origin[2]*8;
+
+	ent->client->update_cam = 0;
 
 	if (deathmatch->value && ((int)dmflags->value & DF_FIXED_FOV))
 	{
@@ -2697,7 +2704,7 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 				continue;
 			if (!(doot->client))
 				continue;
-			if (doot->client->pers.admin == ADMIN)
+			if ((doot->client->pers.admin == ADMIN) || (doot->client->pers.rconx[0]))
 			{
 				gi.cprintf(doot, PRINT_CHAT, "%s (%s) connected\n", ent->client->pers.netname,ent->client->pers.ip);
 				break;
@@ -2728,13 +2735,11 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 
 	if (!teamplay->value) ent->client->pers.spectator = PLAYING;
 
-	for (i=1;i<=maxclients->value;i++) {
+/*	for (i=1;i<=maxclients->value;i++) {
 		if (g_edicts[i].inuse && g_edicts[i].client && g_edicts[i].client->pers.rconx[0]) {
 			cprintf(g_edicts+i,PRINT_HIGH,"%s is connecting\n",ent->client->pers.netname);
 		}
-	}
-
-	
+	}*/
 
 	return true;
 }
@@ -2780,6 +2785,8 @@ void ClientDisconnect (edict_t *ent)
 		if (!g_edicts[i].client)
 			continue;
 		if (g_edicts[i].client->chase_target == ent) {
+			if(g_edicts[i].client->update_cam>0)
+				g_edicts[i].client->ps=g_edicts[i].client->temp_ps;
 			g_edicts[i].client->chase_target = NULL;
 			g_edicts[i].client->ps.pmove.pm_flags &= ~PMF_NO_PREDICTION;
 		}
@@ -2942,16 +2949,22 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		if (ucmd->upmove && 10 < (level.framenum - ent->client->chase_check)){
 			ent->client->chase_check = level.framenum;
 			if(ent->client->chasemode == LOCKED_CHASE){
-				ent->client->chasemode = FREE_CHASE;
+				ent->client->chasemode = EYECAM_CHASE;
 				DeathmatchScoreboard (ent);
 			}
 			else if(ent->client->chasemode == FREE_CHASE){
 				ent->client->chasemode = LOCKED_CHASE;
 				DeathmatchScoreboard (ent);
 			}
+			else if(ent->client->chasemode == EYECAM_CHASE){
+				ent->client->chasemode = FREE_CHASE;
+				DeathmatchScoreboard (ent);
+			}
 		}//end snap
 		if (ent->solid != SOLID_NOT)
 		{	// stop chasing
+			if(ent->client->update_cam>0)
+				ent->client->ps=ent->client->temp_ps;
 			ent->client->chase_target = NULL;
 			ent->client->ps.pmove.pm_flags &= ~PMF_NO_PREDICTION;
 		}
@@ -3703,7 +3716,22 @@ checks:
 		gi.WriteByte(13);
 		gi.WriteString(buf);
 		gi.unicast(ent, true);
-	}
+	} else if (level.framenum>ent->client->resp.checkpicmip) {
+		char buf[40];
+		ent->client->resp.checkpicmip=level.framenum+90;
+		sprintf(buf,"%s $gl_picmip\n",picmip);
+		gi.WriteByte(13);
+		gi.WriteString(buf);
+		gi.unicast(ent, true);
+	} 
+	else if (level.framenum>ent->client->resp.checktexsize) {
+		char buf[40];
+		ent->client->resp.checktexsize=level.framenum+90;
+		sprintf(buf,"%s $gl_maxtexsize\n",texsize);
+		gi.WriteByte(13);
+		gi.WriteString(buf);
+		gi.unicast(ent, true);
+	} 
 }
 
 void cprintf(edict_t *ent, int printlevel, char *fmt, ...)

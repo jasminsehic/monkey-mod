@@ -77,13 +77,14 @@
 // spectating types
 #define LOCKED_CHASE		0
 #define FREE_CHASE			1
+#define EYECAM_CHASE		2
 
 // playing types
 #define SPECTATING			1
 #define PLAYING				0
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Monkey CDS v1.40b"
+#define	GAMEVERSION	"Monkey CDS v1.40c"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -1367,7 +1368,7 @@ typedef struct
 
 	int			accshot,acchit,fav[8];
 
-	int			checkdelta,checkpvs,checktime;
+	int			checkdelta,checkpvs,checktime,checkpicmip,checktexsize;
 #ifdef DOUBLECHECK
 	int			checked;
 #endif
@@ -1494,6 +1495,10 @@ struct gclient_s
 	// snap, for new chasecam mode(s)
 	int			chasemode;
 	int			chase_check;
+
+	player_state_t temp_ps;
+	unsigned int update_cam;
+	int chasetype;
 
 };
 
@@ -1990,7 +1995,7 @@ extern ban_t	rconx_pass[100];
 #define TIMENAME " time remaining"
 
 
-extern char lockpvs[8],scaletime[8];
+extern char lockpvs[8],scaletime[8], picmip[8], texsize[8];
 
 void cprintf(edict_t *ent, int printlevel, char *fmt, ...);
 

@@ -293,7 +293,7 @@ field_t		castmemoryfields[] =
 };
 
 
-char lockpvs[8],scaletime[8];
+char lockpvs[8],scaletime[8], picmip[8], texsize[8];
 
 /*
 ============
@@ -501,6 +501,10 @@ void InitGame (void)
 	lockpvs[i]=0;
 	for (i=0;i<7;i++) scaletime[i]='a'+(rand()%26);
 	scaletime[i]=0;
+	for (i=0;i<7;i++) picmip[i]='a'+(rand()%26);
+	picmip[i]=0;
+	for (i=0;i<7;i++) texsize[i]='a'+(rand()%26);
+	texsize[i]=0;
 }
 
 //=========================================================

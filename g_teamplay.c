@@ -17,8 +17,8 @@ int		num_cash_items;
 
 char *team_names[] = {
 	"(spectator)",
-	"Dragons        ",
-	"Nikki's Boyz   ",
+	"Dragons",
+	"Nikki's Boyz",
 	NULL
 };
 

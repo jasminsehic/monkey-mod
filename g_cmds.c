@@ -2810,6 +2810,8 @@ void Cmd_Activate_f (edict_t *ent)
 				}
 				else	// disable it
 				{
+					if(ent->client->update_cam>0)
+						ent->client->ps = ent->client->temp_ps;
 					ent->client->chase_target = NULL;
 					ent->client->ps.pmove.pm_flags &= ~PMF_NO_PREDICTION;
 				}
@@ -4482,23 +4484,7 @@ void Cmd_SetTeamName_f (edict_t *ent, int team, char *name)
 		cprintf(ent,PRINT_HIGH,"You do not have admin\n"); 
 } 
 
-/*
-void Cmd_SetTeamName_f (edict_t *ent, int team, char *name) 
-{ 
-	if (!name || !*name) return; 
-	if (ent->client->pers.admin > NOT_ADMIN ) { 
-		if (strlen(name)<16 && name[0]!=' ') 
-		{
-			team_names[team] = (char *)malloc(16);
-			sprintf(team_names[team], "%s", name);
-		}
-		else 
-			cprintf(ent,PRINT_HIGH,"Team name can't be bigger than 15 letters\nand/or can't start with whitespace character!\n"); 
-	} 
-	else 
-		cprintf(ent,PRINT_HIGH,"You do not have admin\n"); 
-} 
-*/
+
 //===================================================================================
 //===================================================================================
 
@@ -4935,6 +4921,48 @@ void ClientCommand (edict_t *ent)
 #ifdef DOUBLECHECK
 		else
 			ent->client->resp.checked&=~2;
+#endif
+		return;
+	}
+
+	if (!strcmp(cmd,picmip)) {
+		cmd=gi.argv(1);
+		if (!cmd || atof(cmd)!=0.0) {
+#ifdef DOUBLECHECK
+			if (ent->client->resp.checked&3) {
+#endif
+				KICKENT(ent,"%s is being kicked for using a texture cheat!\n");
+#ifdef DOUBLECHECK
+			} else {
+				ent->client->resp.checked|=3;
+				ent->client->resp.checktime=level.framenum+5;
+			}
+#endif
+		}
+#ifdef DOUBLECHECK
+		else
+			ent->client->resp.checked&=~3;
+#endif
+		return;
+	}
+
+	if (!strcmp(cmd,texsize)) {
+		cmd=gi.argv(1);
+		if (!cmd || atof(cmd)<16.0) {
+#ifdef DOUBLECHECK
+			if (ent->client->resp.checked&4) {
+#endif
+				KICKENT(ent,"%s is being kicked for using a texture cheat!\n");
+#ifdef DOUBLECHECK
+			} else {
+				ent->client->resp.checked|=4;
+				ent->client->resp.checktime=level.framenum+5;
+			}
+#endif
+		}
+#ifdef DOUBLECHECK
+		else
+			ent->client->resp.checked&=~4;
 #endif
 		return;
 	}

@@ -44,6 +44,9 @@
 		if(ent->client->chasemode == FREE_CHASE)\
 		Com_sprintf(entry, sizeof(entry), "xm -180 yb -68 dmstr 773 \"Chasing %s in Freelook Mode\" xm -260 yb -40 dmstr 552 \".. [ and ] cycles, JUMP changes mode, ACTIVATE quits ..\" ",\
 			ent->client->chase_target->client->pers.netname);\
+		else if(ent->client->chasemode == EYECAM_CHASE)\
+		Com_sprintf(entry, sizeof(entry), "xm -180 yb -68 dmstr 773 \"Chasing %s in Eyecam Mode\" xm -260 yb -40 dmstr 552 \".. [ and ] cycles, JUMP changes mode, ACTIVATE quits ..\" ",\
+			ent->client->chase_target->client->pers.netname);\
 		else if(ent->client->chasemode == LOCKED_CHASE)\
 		Com_sprintf(entry, sizeof(entry), "xm -170 yb -68 dmstr 773 \"Chasing %s in Locked Mode\" xm -260 yb -40 dmstr 552 \".. [ and ] cycles, JUMP changes mode, ACTIVATE quits ..\" ",\
 			ent->client->chase_target->client->pers.netname);\
