@@ -248,7 +248,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 		// in realmode, track deaths
 /*		if (dm_realmode->value && !teamplay->value)
 			self->client->resp.deposited++;*/
-		if (deathmatch->value==1 && teamplay->value!=4 && teamplay->value!=1)
+		if (deathmatch->value==1 && teamplay->value!=4 && teamplay->value!=1 && !dm_realmode->value)
 			self->client->resp.deposited++;
 		if (mod!=MOD_RESTART && mod!=MOD_TELEFRAG && (teamplay->value==4
 			|| (dm_realmode->value && !teamplay->value)))
@@ -346,6 +346,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 			gi.bprintf (PRINT_MEDIUM, "%s %s.\n", self->client->pers.netname, message);
 			if ((deathmatch->value) && (mod != MOD_RESTART))
 			{
+                //gi.bprintf (PRINT_MEDIUM,"Subtract 1\n");
 				self->client->resp.score--;
 
 				if ((int)teamplay->value == TM_GANGBANG) {
@@ -430,6 +431,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 				{
 					if (ff)
 					{
+                        //gi.bprintf (PRINT_MEDIUM,"Subtract 2\n");
 						attacker->client->resp.score--;
 
 						if ((int)teamplay->value == TM_GANGBANG) {
@@ -455,7 +457,9 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 //	gi.bprintf (PRINT_MEDIUM,"%s died.\n", self->client->pers.netname);
 	if ((deathmatch->value) && (mod != MOD_RESTART))
 	{
-		self->client->resp.score--;
+		
+        //gi.bprintf (PRINT_MEDIUM,"Subtract 3\n");
+        self->client->resp.score--;
 
 		if ((int)teamplay->value == TM_GANGBANG) {
 			team_cash[self->client->pers.team]--;
@@ -1527,6 +1531,10 @@ void PutClientInServer (edict_t *ent)
 		ent->movetype = MOVETYPE_WALK;
 		ent->solid = SOLID_BBOX;
 		ent->svflags &= ~(SVF_DEADMONSTER|SVF_NOCLIENT);
+
+		//give 3 seconds of imortality on each spawn (anti-camp) 
+	    if(anti_spawncamp->value)
+		        client->invincible_framenum = level.framenum + 30;  //3 seconds 
 	}
 	// RAFAEL
 	ent->viewheight = 40;
@@ -1546,11 +1554,6 @@ void PutClientInServer (edict_t *ent)
 	
 	ent->s.renderfx2 = 0;
 	ent->onfiretime = 0;
-
-    //give 3 seconds of imortality on each spawn (anti-camp) if not RM & is enabled
-    if(atoi(gi.cvar("anti_spawncamp", "", 0)->string))
-        if(!(deathmatch->value && dm_realmode->value))
-            ent->client->invincible_framenum = level.framenum + 30;
 
 	ent->cast_info.aiflags |= AI_GOAL_RUN;	// make AI run towards us if in pursuit
 
@@ -1801,6 +1804,10 @@ ent->bikestate = 0;
 	}
 
 	gi.linkentity (ent);
+    
+    // init origin
+    VectorCopy(ent->s.origin, ent->last_origin);
+    
 
 	// force the current weapon up
 	client->newweapon = client->pers.weapon;
@@ -1921,7 +1928,7 @@ void ClientBeginDeathmatch (edict_t *ent)
 	if (ent->client->pers.version < 121)
 	{
 		//gi.centerprintf( ent, "You are using an old version\nof Kingpin.\n\nGet the upgrade at:\n\nhttp://www.interplay.com/kingpin" );
-        ErrorMSGBox(ent, "\"You are using an old version of Kingpin. Get the upgrade at http://www.monkeymod.com\"");
+        ErrorMSGBox(ent, "\"You are using an old version of Kingpin. Get the 1.21 upgrade at http://www.monkeymod.com\"");
         KICKENT(ent,"%s is being kicked for old version of kingpin.exe\n");
 	}
 
@@ -2254,7 +2261,8 @@ void maxrate_think(edict_t *self)
 
 void nameclash_think(edict_t *self)
 {
-	gi.cprintf(self->owner, PRINT_HIGH, "Another player on the server is already using this name.\n");
+  //  if (!(Q_stricmp (self->owner->client->pers.netname, NAME_CLASH_STR) == 0)) 
+	    gi.cprintf(self->owner, PRINT_HIGH, "Another player on the server is already using this name.\n");
 	G_FreeEdict(self);
 }
 
@@ -2276,7 +2284,8 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	char	*extras;
     int     fIgnoreName = 0,a;
 
-	// client exe version
+
+ 	// client exe version
 	s = Info_ValueForKey (userinfo, "ver");
 	if (strlen(s))
 		ent->client->pers.version = atoi(s);
@@ -2306,13 +2315,15 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
         fIgnoreName = 1;
     }
 */    
-	// set name
 	s = Info_ValueForKey (userinfo, "name");
-	if (strchr(s,'%')) {
+
+    if (strchr(s,'%')) 
+    {
 		char *s2;
 		while (s2=strchr(s,'%')) *s2=' ';
 		Info_SetValueForKey (userinfo, "name", s);
 	}
+
 	for (a=strlen(s)-1;a>=0 && s[a]<33;a--) ;
 	if (a==-1) {
 //		if( '\0' != ent->client->pers.netname[0] )
@@ -2343,7 +2354,11 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 //                if( '\0' != ent->client->pers.netname[0] )
   //                  fIgnoreName = 1;
     //            else
-                    s = NAME_CLASH_STR;
+
+                if (!(Q_stricmp (ent->client->pers.netname, NAME_CLASH_STR) == 0)) 
+                    gi.bprintf(PRINT_HIGH, "Another player is trying to use %s's name\n", s); 
+
+                s = NAME_CLASH_STR;
 
                 Info_SetValueForKey (userinfo, "name", s);
             }
@@ -2352,23 +2367,27 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	}
     // Standard Logging
 
-    if( !fIgnoreName )
+    // stop flooding -- 5 seconds
+    if (level.framenum > (ent->name_change_frame + 50))
     {
-        // start - Standard Logging
-        // Has the player got a name
-        if( strlen(ent->client->pers.netname) )
+        if( !fIgnoreName )
         {
-            // has the name changed
-            if( strcmp( ent->client->pers.netname, s ) )
-            {
-                // Standard Logging -  log player rename
-                //sl_LogPlayerRename( &gi, ent->client->pers.netname, s, level.time );
-                gi.bprintf(PRINT_HIGH, "%s changed name to %s\n", ent->client->pers.netname, s);
+            // start - Standard Logging
+            // Has the player got a name
+            if( strlen(ent->client->pers.netname) )
+            {          
+                // has the name changed
+                if( strcmp( ent->client->pers.netname, s ) )
+                {
+                    // Standard Logging -  log player rename
+                    //sl_LogPlayerRename( &gi, ent->client->pers.netname, s, level.time );
+                    gi.bprintf(PRINT_HIGH, "%s changed name to %s\n", ent->client->pers.netname, s);
+                    ent->name_change_frame = level.framenum;
+                }
             }
+            // end - Standard Logging
+            strncpy (ent->client->pers.netname, s, sizeof(ent->client->pers.netname)-1);
         }
-        // end - Standard Logging
-
-        strncpy (ent->client->pers.netname, s, sizeof(ent->client->pers.netname)-1);
     }
 
 	if (CheckNameBan(s))
@@ -2616,6 +2635,7 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 
 	// save off the userinfo in case we want to check something later
 	strncpy (ent->client->pers.userinfo, userinfo, MAX_INFO_STRING-1);
+
 }
 
 
@@ -2647,6 +2667,11 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	ent->strafejump_count = 0;
 	ent->jump_framenum = 0;
 	ent->land_framenum = 1;
+
+    // client idle variables
+    ent->check_idle = 0;
+    ent->check_talk = 0;
+    ent->check_shoot = 0;
 
 	// check to see if they are on the banned IP list
 	value = Info_ValueForKey (userinfo, "ip");
@@ -2704,6 +2729,8 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	}
 
 	ent->client->resp.enterframe = 0;
+    ent->name_change_frame = -80;  //just to be sure
+
 	ClientUserinfoChanged (ent, userinfo);
 
 	if (game.maxclients > 1)
@@ -2758,7 +2785,7 @@ Will not be called between levels.
 void ClientDisconnect (edict_t *ent)
 {
 	int		playernum;
-	int		i;
+	int		i, z;
 	char	*skinvalue;
 
 	if (!ent->client)
@@ -2771,6 +2798,13 @@ void ClientDisconnect (edict_t *ent)
 	{
 		playerlist[level.player_num].frags = ent->client->resp.score;
 		playerlist[level.player_num].deposits = ent->client->resp.deposited;
+        playerlist[level.player_num].acchit = ent->client->resp.acchit;
+        playerlist[level.player_num].accshot = ent->client->resp.accshot;
+        //do the fav too
+        for(z=0;z<8;z++)
+        {
+           playerlist[level.player_num].fav[z] = ent->client->resp.fav[z];
+        }
 		playerlist[level.player_num].team = ent->client->pers.team;
 		playerlist[level.player_num].time = level.framenum - ent->client->resp.enterframe;
 
@@ -3178,6 +3212,24 @@ chasing:
 	}
 // END Snap
 
+    if(!VectorCompare(ent->s.origin, ent->last_origin))
+    {
+        ent->check_idle = level.framenum;
+    }
+
+    
+    //check if idle
+    if(ent->client->pers.spectator!=SPECTATING)
+    {
+        if(((level.framenum - ent->check_idle)>(idle_client->value*10)) 
+            && ((level.framenum - ent->check_talk)>(idle_client->value*10)) 
+            && ((level.framenum - ent->check_shoot)>(idle_client->value*10))) //now set by a cvar
+        {
+            //make them spectators
+            Cmd_Spec_f(ent);
+        }
+    }
+
 #if !DEMO
 	// bikestuff
 	if (ent->flags & (FL_BIKE) || ent->flags & (FL_HOVERCAR | FL_HOVERCAR_GROUND) )
@@ -3381,8 +3433,12 @@ chasing:
 	}
 
     //they shoot...they are mortal
-    if (((client->latched_buttons|client->buttons) & BUTTON_ATTACK))
+    if (((client->latched_buttons|client->buttons) & BUTTON_ATTACK)
+		&& (client->invincible_framenum<level.framenum+29))
         client->invincible_framenum = 0;
+
+    if ((client->latched_buttons|client->buttons) & BUTTON_ATTACK)
+        ent->check_shoot = level.framenum;
 
     // JOSEPH 22-JAN-99
 	// Activate button is pressed
@@ -3550,6 +3606,8 @@ car_resume:
 		if (other->inuse && other->client->chase_target == ent)
 			UpdateChaseCam(other);
 	}
+
+    VectorCopy(ent->s.origin, ent->last_origin);
 }
 
 

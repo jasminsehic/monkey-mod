@@ -70,6 +70,7 @@ cvar_t	*flood_waitdelay;
 
 cvar_t  *kick_flamehack;
 cvar_t  *anti_spawncamp;
+cvar_t  *idle_client;
 
 // Ridah, new cvar's
 cvar_t	*developer;
@@ -1128,5 +1129,8 @@ void G_RunFrame (void)
 	}
 	sprintf(buf2,"%dd:%dh:%dm",uptime_days,uptime_hours,uptime_minutes);
 	gi.cvar_set("uptime",buf2);
+
+    if(idle_client->value<60)
+        gi.cvar_set("idle_client", "60");
 }
 

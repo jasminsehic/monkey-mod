@@ -726,23 +726,38 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	// knockback still occurs
 	if (!(dflags & DAMAGE_NO_PROTECTION) && (targ != attacker) && ((deathmatch->value && (teamplay->value || ((int)(dmflags->value) & (DF_MODELTEAMS/*| DF_SKINTEAMS*/))) /*|| coop->value*/)))
 	{
-		if ((OnSameTeam (targ, attacker)) && (!targ->client->pers.friendly_vulnerable))
+	  //  cprintf (targ, PRINT_HIGH, "1 brace\n");
+        if ((OnSameTeam (targ, attacker)) && (!targ->client->pers.friendly_vulnerable))
 		{
+           // cprintf (targ, PRINT_HIGH, "2 brace\n");
 			if ((int)(dmflags->value) & DF_NO_FRIENDLY_FIRE)
 			{
+             //   cprintf (targ, PRINT_HIGH, "3 brace\n");
 				dmg = 0;
 			}
 			else
+            {
+              //  cprintf (targ, PRINT_HIGH, "4 brace\n");
 				mod |= MOD_FRIENDLY_FIRE;
-		} else if (attacker->client && !targ->deadflag)
+            }
+		} 
+        else if (attacker->client && !targ->deadflag)
+        {
 			hit=1;
-	} else if (attacker->client && !targ->deadflag && targ!=attacker)
+          //  cprintf (targ, PRINT_HIGH, "5 brace\n");
+        }
+	} 
+    else if (attacker->client && !targ->deadflag && targ!=attacker)
+    {
 		hit=1;
+      //  cprintf (targ, PRINT_HIGH, "6 brace\n");
+    }
 	meansOfDeath = mod;
 
 	// easy mode takes half damage
 	if (deathmatch->value == 0 && targ->client)
 	{
+       // cprintf (targ, PRINT_HIGH, "7 brace\n");
 		if (skill->value == 0)
 			dmg *= 0.2;		// Ridah, bumped it up a bit, since Rockets were only doing 2% health, 4% would be a bit more reasonable
 		else if (skill->value == 1)
@@ -766,6 +781,7 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	}
 	else if (deathmatch->value && dm_realmode->value && attacker != targ && attacker->client)
 	{
+      //  cprintf (targ, PRINT_HIGH, "8 brace\n");
 		dmg *= 4;
 	}
 
@@ -855,7 +871,8 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		int     random;
 		float	takefactor;	
 		
-		// JOSEPH 21-MAY-99
+      //  cprintf (targ, PRINT_HIGH, "9 brace\n");
+        // JOSEPH 21-MAY-99
 		if (mod == MOD_DOGBITE)
 		{
 			if (inflictor->s.origin[2] < targ->s.origin[2]) // legs
@@ -940,13 +957,17 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		{
 			int takehealth;
 			int takeshield;
+
+          //  cprintf (targ, PRINT_HIGH, "10 brace\n");
 			
 			takehealth = take * takefactor;
 			takeshield = take - takehealth;
 
 			// Ridah, make Flamethrower burn armor away faster than normal
 			if (mod == MOD_FLAMETHROWER)
-			{
+            {
+              //  cprintf (targ, PRINT_HIGH, "11 brace\n");
+
 				if (takeshield < 1)
 					takeshield = 1;
 
@@ -958,6 +979,8 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			// JOSEPH 5-APR-99
 			if (takeshield <= targ->client->pers.inventory[ index ])
 			{
+              //  cprintf (targ, PRINT_HIGH, "12 brace\n");
+
 				targ->client->pers.inventory[ index ] -= takeshield;
 				take = takehealth;
 				if (!take)
@@ -965,7 +988,9 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			}
 			else
 			{
-				takehealth = ((take - targ->client->pers.inventory[ index ])+
+			//	cprintf (targ, PRINT_HIGH, "13 brace\n");
+
+                takehealth = ((take - targ->client->pers.inventory[ index ])+
 					          (takefactor*targ->client->pers.inventory[ index ])); 
 				targ->client->pers.inventory[ index ] = 0;
 				take = takehealth;
@@ -980,6 +1005,8 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	// check for godmode
 	if ( (targ->flags & FL_GODMODE) && !(dflags & DAMAGE_NO_PROTECTION) )
 	{
+       // cprintf (targ, PRINT_HIGH, "14 brace\n");
+
 		take = 0;
 		save = dmg;
 		SpawnDamage (targ, te_sparks, point, normal, save);
@@ -988,8 +1015,10 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	// check for invincibility
 	if ((client && client->invincible_framenum > level.framenum ) && !(dflags & DAMAGE_NO_PROTECTION))
 	{
+       // cprintf (targ, PRINT_HIGH, "15 brace\n");
 		if (targ->pain_debounce_time < level.time)
 		{
+         //   cprintf (targ, PRINT_HIGH, "16 brace\n");
 			// JOSEPH 29-MAR-99
 			//gi.sound(targ, CHAN_ITEM, gi.soundindex("items/protect4.wav"), 1, ATTN_NORM, 0);
 			// END JOSEPH
@@ -1015,11 +1044,16 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 // do the damage
 	if (take)
 	{
+     //  cprintf (targ, PRINT_HIGH, "17 brace\n");
+
 		if (mod == MOD_FLAMETHROWER)
 		{
+          //  cprintf (targ, PRINT_HIGH, "18 brace\n");
 		}
 		else
 		{
+         //   cprintf (targ, PRINT_HIGH, "19 brace\n");
+
 			if ((targ->svflags & SVF_MONSTER) || (client))
 				SpawnDamage (targ, TE_BLOOD, point, normal, take);
 			else
@@ -1032,16 +1066,19 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		// Ridah, trigger health threshold events
 		if (targ->health_target && (targ->health < targ->health_threshold))
 		{
+        //    cprintf (targ, PRINT_HIGH, "20 brace\n");
 			CheckHealthTarget( targ, targ->health_target );
 			targ->health_target = NULL;
 		}
 		else if (targ->health_target2 && (targ->health < targ->health_threshold2))
 		{
-			CheckHealthTarget( targ, targ->health_target2 );
+		//	cprintf (targ, PRINT_HIGH, "21 brace\n");
+            CheckHealthTarget( targ, targ->health_target2 );
 			targ->health_target2 = NULL;
 		}
 		else if (targ->health_target3 && (targ->health < targ->health_threshold3))
 		{
+         //   cprintf (targ, PRINT_HIGH, "22 brace\n");
 			CheckHealthTarget( targ, targ->health_target3 );
 			targ->health_target3 = NULL;
 		}
@@ -1049,8 +1086,13 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		
 		if (targ->health <= 0)
 		{
-			if ((targ->svflags & SVF_MONSTER) || (client))
+			
+          //  cprintf (targ, PRINT_HIGH, "23 brace\n");
+
+            if ((targ->svflags & SVF_MONSTER) || (client))
 			{
+              //  cprintf (targ, PRINT_HIGH, "24 brace\n");
+
 				targ->flags |= FL_NO_KNOCKBACK;
 				M_ReactToDamage (targ, attacker, take);	// Ridah, so our friends seek vengence
 			}
@@ -1058,12 +1100,15 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			// JOSEPH 3-MAR-99
 			if (targ->svflags & SVF_MONSTER)
 			{
+             //   cprintf (targ, PRINT_HIGH, "25 brace\n");
 				// targ->solid = SOLID_NOT;			
 				targ->svflags |= SVF_DEADMONSTER;
 				
 				if (mod == MOD_ROCKET)
 				{
-					targ->s.renderfx2 &= ~RF2_DIR_LIGHTS;
+				//    cprintf (targ, PRINT_HIGH, "26 brace\n");
+
+                    targ->s.renderfx2 &= ~RF2_DIR_LIGHTS;
 				}
 			}
 			// END JOSEPH
@@ -1079,9 +1124,13 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	if (	(targ->svflags & SVF_MONSTER)
 		&&	(targ->health > 0))		// Ridah, 31-may-99, possibly fixes Whore crouching death bug
 	{
+      //  cprintf (targ, PRINT_HIGH, "27 brace\n");
+
 		M_ReactToDamage (targ, attacker, take);
 		if (take)
 		{
+          //  cprintf (targ, PRINT_HIGH, "28 brace\n");
+
 			targ->pain (targ, attacker, knockback, take, 0, 0);
 			// nightmare mode monsters don't go into pain frames often
 			if (skill->value >= 3)
@@ -1090,11 +1139,15 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	}
 	else if (client)
 	{
+      //  cprintf (targ, PRINT_HIGH, "29 brace\n");
+
 		if (!(targ->flags & FL_GODMODE) && (take))
 			targ->pain (targ, attacker, knockback, take, 0, 0);
 	}
 	else if (take)
 	{
+       // cprintf (targ, PRINT_HIGH, "30 brace\n");
+
 		if (targ->pain)
 			targ->pain (targ, attacker, knockback, take, 0, 0);
 	}
@@ -1104,11 +1157,20 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	// at the end of the frame
 	if (client)
 	{
+      //  cprintf (targ, PRINT_HIGH, "31 brace\n");
+
 		client->damage_armor += asave;
 		if (mod == MOD_FLAMETHROWER)
+        {
+           // cprintf (targ, PRINT_HIGH, "32 brace\n");
+
 			client->damage_flame += take*4;
+        }
 		else
-			client->damage_blood += take;
+        {
+		//	cprintf (targ, PRINT_HIGH, "33 brace\n");
+            client->damage_blood += take;
+        }
 		client->damage_knockback += knockback;
 		VectorCopy (point, client->damage_from);
 	}

@@ -15,17 +15,17 @@ PACKET FILTERING
 
 You can add or remove addresses from the filter list with:
 
-addip <ip>
-removeip <ip>
+sv addip <ip>
+sv removeip <ip>
 
 The ip address is specified in dot format, and any unspecified digits will match any value, so you can specify an entire class C network with "addip 192.246.40".
 
 Removeip will only remove an address specified exactly the same way.  You cannot addip a subnet, then removeip a single host.
 
-listip
+sv listip
 Prints the current list of filters.
 
-writeip
+sv writeip
 Dumps "addip <ip>" commands to listip.cfg so it can be execed at a later date.  The filter lists are not saved and restored by default, because I beleive it would cause too much confusion.
 
 filterban <0 or 1>

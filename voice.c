@@ -140,6 +140,7 @@ again:
 
 		if (deathmatch->value || VectorDistance( g_edicts[1].s.origin, self->s.origin ) < 1024)
 		{
+            
            // if(other!=NULL)
            // {
                 if ((other && other->client) || self->client)

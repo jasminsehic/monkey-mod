@@ -84,7 +84,7 @@
 #define PLAYING				0
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Monkey CDS v1.50"
+#define	GAMEVERSION	"Monkey CDS v1.50a"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -813,6 +813,7 @@ extern	cvar_t	*flood_waitdelay;
 
 extern	cvar_t	*kick_flamehack;
 extern	cvar_t	*anti_spawncamp;
+extern  cvar_t  *idle_client;
 
 // Ridah, new cvar's
 extern	cvar_t	*developer;
@@ -1208,8 +1209,9 @@ void SaveClientData (void);
 void HideWeapon (edict_t *ent);
 void FetchClientEntData (edict_t *ent);
 void ErrorMSGBox(edict_t *ent, char *string);
-void CheckBlackBox(void);
-edict_t *FindBlackBox(void);
+//void CheckBlackBox(void);
+void Cmd_Spec_f (edict_t *self);
+//edict_t *FindBlackBox(void);
 
 // 
 //	g_pawn.c
@@ -1455,7 +1457,7 @@ struct gclient_s
 
 	// powerup timers
 	float		quad_framenum;
-	float		invincible_framenum;
+	int			invincible_framenum;
 	float		breather_framenum;
 	float		enviro_framenum;
 
@@ -1869,6 +1871,14 @@ struct edict_s
 	int			kickdelay;
 	char		*kickmess;
 
+    //client idleing
+    vec3_t      last_origin;
+    int         check_idle;
+    int         check_talk;
+    int         check_shoot;
+
+    int         name_change_frame;
+
 //	Snap, bunnyhop
 	int			jump_framenum;
 	int			land_framenum;
@@ -1984,6 +1994,7 @@ typedef struct // stores player info if they disconnect
 	int	team;
 	char skin[64];
 	int	time;
+    int	accshot,acchit,fav[8];
 } player_t;
 
 extern player_t playerlist[64];

@@ -1462,8 +1462,11 @@ void DeathmatchScoreboardMessage (edict_t *ent)
 					"xr %i yv %i dmstr 442 \"NAME         ping hits  fph\" ",
 					-36*10 - 10, -60+-2*14 );
 			else
-				Com_sprintf (entry, sizeof(entry),
+			/*	Com_sprintf (entry, sizeof(entry),
 					"xr %i yv %i dmstr 442 \"NAME         ping hits score\" ",
+					-36*10 - 10, -60+-2*14 );*/
+                Com_sprintf (entry, sizeof(entry),
+					"xr %i yv %i dmstr 442 \"NAME         ping time  hits\" ",
 					-36*10 - 10, -60+-2*14 );
 		}
 		else	// normal
@@ -1546,7 +1549,7 @@ void DeathmatchScoreboardMessage (edict_t *ent)
 			{		// show deaths
 				Com_sprintf (entry, sizeof(entry),
 					"yv %i ds %s %i %i %i %i ",
-					-60+i*16, tag, sorted[i]/*cl->pers.netname*/, cl->ping, cl->resp.score, sortedscores[i] );
+					-60+i*16, tag, sorted[i], /*cl->ping, cl->resp.score, sortedscores[i] );*/ cl->ping, (level.framenum - cl->resp.enterframe)/600, cl->resp.score );
 			}
 			else
 			{
@@ -1685,6 +1688,66 @@ void DeathmatchScoreboard (edict_t *ent)
 	else
 		gi.unicast (ent, false);//true);
 }
+
+void NoScoreboardMessage (edict_t *ent)
+{
+	char	entry[1024];
+	char	string[1400];
+	int		stringlength;
+	int		j;
+
+	string[0] = 0;
+	stringlength = 0;
+
+	if ((level.modeset != MATCHSETUP) && (level.modeset != FINALCOUNT)//SNAP
+		&& ent->client->pers.spectator == SPECTATING) {
+		SHOWCHASENAME
+		CHASEMESSAGE
+	}
+
+	gi.WriteByte (svc_layout);
+	gi.WriteString (string);
+}
+
+void DeathmatchScoreboardNew (edict_t *ent)
+{
+	switch(ent->client->showscores)
+    {
+    case SCORE_MOTD:
+		MOTDScoreboardMessage (ent);
+        break;
+    case SCORE_REJOIN:
+		RejoinScoreboardMessage (ent);
+        break;
+    case SPECTATORS:
+		SpectatorScoreboardMessage (ent);
+        break;
+    case SCORE_MAP_VOTE:
+		VoteMapScoreboardMessage(ent);
+        break;
+    case NO_SCOREBOARD:
+        NoScoreboardMessage(ent);
+        break;
+	default:
+        {
+            if (teamplay->value)
+                if ((level.modeset == MATCHSETUP) || (level.modeset == FINALCOUNT) || (level.modeset == FREEFORALL))
+                    MatchSetupScoreboardMessage (ent);
+                else
+                    GrabDaLootScoreboardMessage (ent);
+                else	
+                    DeathmatchScoreboardMessage (ent);	
+        }    
+        break;
+    }
+
+
+	if (level.intermissiontime)
+		gi.unicast (ent, true);
+	else
+		gi.unicast (ent, false);//true);
+}
+
 
 
 /*
@@ -1938,23 +2001,34 @@ void G_SetStats (edict_t *ent)
 			  (ent->client->ps.stats[STAT_PICKUP_STRING] == CS_ITEMS+index3)))
 			ent->client->ps.stats[STAT_CASH_PICKUP] = 0;
 
-		// JOSEPH 1-APR-99-B
-		item = FindItem ("Helmet Armor");
-		ent->client->ps.stats[STAT_ARMOR1] = ent->client->pers.inventory[ITEM_INDEX(item)];
-		item = FindItem ("Jacket Armor");
-		ent->client->ps.stats[STAT_ARMOR2] = ent->client->pers.inventory[ITEM_INDEX(item)];
-		item = FindItem ("Legs Armor");
-		ent->client->ps.stats[STAT_ARMOR3] = ent->client->pers.inventory[ITEM_INDEX(item)];
-		item = FindItem ("Helmet Armor Heavy");
-		if (ent->client->pers.inventory[ITEM_INDEX(item)])
-			ent->client->ps.stats[STAT_ARMOR1] = ent->client->pers.inventory[ITEM_INDEX(item)] + 1024;
-		item = FindItem ("Jacket Armor heavy");
-		if (ent->client->pers.inventory[ITEM_INDEX(item)])
-			ent->client->ps.stats[STAT_ARMOR2] = ent->client->pers.inventory[ITEM_INDEX(item)] + 1024;
-		item = FindItem ("Legs Armor Heavy");
-		if (ent->client->pers.inventory[ITEM_INDEX(item)])
-			ent->client->ps.stats[STAT_ARMOR3] = ent->client->pers.inventory[ITEM_INDEX(item)] + 1024;
-		// END JOSEPH		
+		if (ent->client->invincible_framenum>level.framenum &&
+			((ent->client->invincible_framenum-level.framenum)&4) &&
+            ent->client->pers.spectator!=SPECTATING) {
+			item = FindItem ("Helmet Armor Heavy");
+			ent->client->ps.stats[STAT_ARMOR1] = 2023;
+			item = FindItem ("Jacket Armor heavy");
+			ent->client->ps.stats[STAT_ARMOR2] = 2023;
+			item = FindItem ("Legs Armor Heavy");
+			ent->client->ps.stats[STAT_ARMOR3] = 2023;
+		} else {
+			// JOSEPH 1-APR-99-B
+			item = FindItem ("Helmet Armor");
+			ent->client->ps.stats[STAT_ARMOR1] = ent->client->pers.inventory[ITEM_INDEX(item)];
+			item = FindItem ("Jacket Armor");
+			ent->client->ps.stats[STAT_ARMOR2] = ent->client->pers.inventory[ITEM_INDEX(item)];
+			item = FindItem ("Legs Armor");
+			ent->client->ps.stats[STAT_ARMOR3] = ent->client->pers.inventory[ITEM_INDEX(item)];
+			item = FindItem ("Helmet Armor Heavy");
+			if (ent->client->pers.inventory[ITEM_INDEX(item)])
+				ent->client->ps.stats[STAT_ARMOR1] = ent->client->pers.inventory[ITEM_INDEX(item)] + 1024;
+			item = FindItem ("Jacket Armor heavy");
+			if (ent->client->pers.inventory[ITEM_INDEX(item)])
+				ent->client->ps.stats[STAT_ARMOR2] = ent->client->pers.inventory[ITEM_INDEX(item)] + 1024;
+			item = FindItem ("Legs Armor Heavy");
+			if (ent->client->pers.inventory[ITEM_INDEX(item)])
+				ent->client->ps.stats[STAT_ARMOR3] = ent->client->pers.inventory[ITEM_INDEX(item)] + 1024;
+			// END JOSEPH		
+		}
 	}
 	// END JOSEPH
 

@@ -67,7 +67,6 @@ void P_DamageFeedback (edict_t *player)
 		client->ps.stats[STAT_FLASHES] |= 1;
 	if (client->damage_armor && !(player->flags & FL_GODMODE) && (client->invincible_framenum <= level.framenum))
 		client->ps.stats[STAT_FLASHES] |= 2;
-
 	// total points of damage shot at the player this frame
 	count = (client->damage_blood + client->damage_flame + client->damage_armor + client->damage_parmor);
 	if (count == 0)
@@ -938,8 +937,11 @@ void G_SetClientEffects (edict_t *ent)
 	if (ent->client->invincible_framenum > level.framenum)
 	{
 		remaining = ent->client->invincible_framenum - level.framenum;
-		if (remaining > 30 || (remaining & 4) )
-			ent->s.effects |= EF_PENT;
+		if (remaining > 30 || (remaining & 4) ) {
+//			ent->s.effects |= EF_PENT;
+			ent->s.effects |= EF_COLOR_SHELL;
+			ent->s.renderfx |= RF_SHELL_GREEN;
+		}
 	}
 
 	// show cheaters!!!
