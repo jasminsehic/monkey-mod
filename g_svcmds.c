@@ -317,6 +317,10 @@ void	ServerCommand (void)
 		SVCmd_WriteIP_f ();
     else if (Q_stricmp (cmd, "cds") == 0)
 		SVCmd_Enable_CDS_f ();
+    else if (!Q_stricmp(cmd,"banip")) 
+        Cmd_BanDicks_f(NULL, 1);
+    else if (!Q_stricmp(cmd,"banname")) 
+        Cmd_BanDicks_f(NULL, 0);
 	else
 		gi.cprintf (NULL, PRINT_HIGH, "Unknown server command \"%s\"\n", cmd);
 }
