@@ -156,7 +156,16 @@ void MatchStart()  // start the match
 		self->client->pers.currentcash = 0;
 		self->client->resp.acchit = self->client->resp.accshot = 0;
 		memset(self->client->resp.fav,0,8*sizeof(int));
-	}
+        
+        if (self->client->pers.spectator == SPECTATING)
+            continue;
+
+        meansOfDeath = MOD_RESTART;
+        self->client->pers.spectator = SPECTATING;
+        self->flags &= ~FL_GODMODE;
+        self->health = 0;
+        ClientBeginDeathmatch( self );
+    }
 
 	gi.WriteByte( svc_stufftext );
 	gi.WriteString( va("play world/cypress%i.wav", 2+(rand()%4)) );

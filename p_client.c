@@ -1462,6 +1462,7 @@ void PutClientInServer (edict_t *ent)
 		memcpy (userinfo, client->pers.userinfo, sizeof(userinfo));
 		InitClientPersistant (client);
 		ent->move_frame=0;
+        ent->name_change_frame = -80;  //just to be sure
 		ClientUserinfoChanged (ent, userinfo);
 	}
 /*
@@ -1539,7 +1540,7 @@ void PutClientInServer (edict_t *ent)
 	// RAFAEL
 	ent->viewheight = 40;
 
-	ent->inuse = true;
+    ent->inuse = true;
 	ent->classname = "player";
 	ent->mass = 200;
 	ent->deadflag = DEAD_NO;
@@ -3219,7 +3220,8 @@ chasing:
 
     
     //check if idle
-    if(ent->client->pers.spectator!=SPECTATING)
+    if(ent->client->pers.spectator!=SPECTATING
+       && (level.modeset==MATCH || level.modeset==TEAMPLAY || level.modeset==FREEFORALL))
     {
         if(((level.framenum - ent->check_idle)>(idle_client->value*10)) 
             && ((level.framenum - ent->check_talk)>(idle_client->value*10)) 
@@ -3640,9 +3642,9 @@ void ClientBeginServerFrame (edict_t *ent)
 	if (level.intermissiontime)
 		goto checks;
 
-	// RAFAEL
+	// RAFAEL - tical commented out
 	if (level.cut_scene_time)
-		return;
+    	return;
 
 	if (level.pawn_time)
 		return;
@@ -3742,6 +3744,7 @@ void ClientBeginServerFrame (edict_t *ent)
 		}
 	}
 
+  
 checks:
 #define CLEAN_CLEAN		1
 #define CLEAN_TIMED		8

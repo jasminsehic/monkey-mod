@@ -344,9 +344,11 @@ void InitGame (void)
 	dedicated = gi.cvar ("dedicated", "0", CVAR_NOSET);
 
 	// latched vars
-	sv_cheats = gi.cvar ("cheats", "0", CVAR_SERVERINFO|CVAR_LATCH);
+	sv_cheats = gi.cvar ("cheats", "0", CVAR_LATCH);
 	gi.cvar ("gamename", GAMEVERSION , CVAR_SERVERINFO | CVAR_LATCH);
 	gi.cvar ("gamedate", __DATE__ , CVAR_SERVERINFO | CVAR_LATCH);
+
+    no_spec = gi.cvar ("no_spec", "0", CVAR_SERVERINFO);
 
 	maxclients = gi.cvar ("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
 	deathmatch = gi.cvar ("deathmatch", "0", CVAR_LATCH);
@@ -401,7 +403,7 @@ void InitGame (void)
 
     kick_flamehack = gi.cvar ("kick_flamehack","0",CVAR_SERVERINFO);
     anti_spawncamp = gi.cvar ("anti_spawncamp","0",CVAR_SERVERINFO);
-    idle_client	= gi.cvar("idle_client", "60", 0);
+    idle_client	= gi.cvar("idle_client", "120", 0);
 
 // Ridah, new cvar's
 	developer = gi.cvar ("developer", "0", 0);
@@ -412,7 +414,7 @@ void InitGame (void)
 
 	g_vehicle_test = gi.cvar ("g_vehicle_test", "0", CVAR_LATCH);	// Enables Hovercars for all players
 
-	dm_locational_damage = gi.cvar ("dm_locational_damage", "0", CVAR_SERVERINFO);
+	dm_locational_damage = gi.cvar ("dm_locational_damage", "0", 0);
 
 	showlights =  gi.cvar ("showlights", "0", 0);
 

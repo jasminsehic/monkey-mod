@@ -124,8 +124,8 @@ int proccess_line(char*	buffer)
     if (strstr(buffer, DISABLE_ASC_STRING))
 		return DISABLE_ASC_KEYWORD;
 
-    if (strstr(buffer, ENABLE_NOFLAMEHACK_CHECK_STRING))
-		return ENABLE_NOFLAMEHACK_CHECK_KEYWORD;
+/*    if (strstr(buffer, ENABLE_NOFLAMEHACK_CHECK_STRING))
+		return ENABLE_NOFLAMEHACK_CHECK_KEYWORD;*/
 
 	if (strstr(buffer, ENABLE_SEE_KILLER_HEALTH_STRING))
 		return ENABLE_SEE_KILLER_HEALTH_KEYWORD;
@@ -309,10 +309,10 @@ int proccess_ini_file()
 		//	enable_asc = true;
             gi.cvar_set("anti_spawncamp", "1");
 			break;
-         case ENABLE_NOFLAMEHACK_CHECK_KEYWORD:
+      /*  case ENABLE_NOFLAMEHACK_CHECK_KEYWORD:
 			//noflamehackcheck = true;
             gi.cvar_set("kick_flamehack", "1");
-			break;
+			break;*/
 		case ENABLE_SEE_KILLER_HEALTH_KEYWORD:
 			enable_killerhealth = true;
 			break;

@@ -27,7 +27,7 @@
 #define		DISABLE_CURSE_STRING	"disable_curse"
 #define		UNLIMITED_CURSE_STRING	"unlimited_curse"
 #define		DISABLE_ASC_STRING	    "disable_asc"
-#define		ENABLE_NOFLAMEHACK_CHECK_STRING	    "kick_flamehack"
+//#define		ENABLE_NOFLAMEHACK_CHECK_STRING	    "kick_flamehack"
 #define		ENABLE_SEE_KILLER_HEALTH_STRING	"enable_killerhealth"
 
 #define		MAX_STRING_LENGTH	100
@@ -69,7 +69,7 @@
 #define		UNLIMITED_CURSE_KEYWORD		30
 //#define		URL_KEYWORD			        31
 #define     DISABLE_ASC_KEYWORD          32
-#define     ENABLE_NOFLAMEHACK_CHECK_KEYWORD  33
+//#define     ENABLE_NOFLAMEHACK_CHECK_KEYWORD  33
 
 #define		STANDBY					0
 #define		ADD_CUSTOM				1

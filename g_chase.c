@@ -146,10 +146,6 @@ void ChaseNext(edict_t *ent)
 	edict_t *e;
 
 
-    //tical -- testing blackbox
-//    MoveClientToBlackBox(ent);
-//    return;
-
 	if (!ent->client->chase_target)
 	{
 		// select the first entity, then go from there

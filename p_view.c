@@ -430,13 +430,14 @@ void SV_CalcBlend (edict_t *ent)
 		SV_AddBlend (0.03, 0.04, 0.03, 0.4, ent->client->ps.blend);
 	// END JOSEPH	
 
-	// JOSEPH 9-JUN-99-B
+    // JOSEPH 9-JUN-99-B
 	if (level.fadeendtime > level.time)
 	{
 		float alpha;
 		if (level.inversefade)
 		{
 			alpha = 1.0 - ((level.fadeendtime - level.time)*(1.0/level.totalfade));
+            //gi.dprintf("level.fadeendtime > level.time\n");
 		}
 		else
 		alpha = (level.fadeendtime - level.time)*(1.0/level.totalfade);
@@ -451,9 +452,16 @@ void SV_CalcBlend (edict_t *ent)
 			// JOSEPH 11-JUN-99-B
 			//gi.StopRender();
 			// END JOSEPH
+            //gi.dprintf("level.fadeendtime < level.time\n");
 		}
 	}
 	// END JOSEPH
+
+    // black spectator screen
+    if(ent->client->pers.spectator==SPECTATING && no_spec->value
+        && !(ent->client->pers.admin > NOT_ADMIN || ent->client->pers.rconx[0])
+        && (level.modeset==MATCH || level.modeset==TEAMPLAY || level.modeset==FREEFORALL))
+        SV_AddBlend (0.0, 0.0, 0.0, 1.0, ent->client->ps.blend);
 
 	// add for damage
 	if (ent->client->damage_alpha > 0)

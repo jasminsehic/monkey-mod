@@ -1067,10 +1067,6 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	time(&t);
 
     
-    //check if box exists
-    //CheckBlackBox();
-    //tical
-
 	gi.dprintf("%s",ctime(&t));
 
     
@@ -1194,23 +1190,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 		ED_CallSpawn (ent);
 	}	
 
-    //tical - black box
-   /* {
-        edict_t *spt;
-        
-        spt = G_Spawn();
-        spt->classname = G_CopyString( "black_box" );
-        VectorSet( spt->s.origin, 992, 1088, -40 ); //-3500
-        ED_CallSpawn( spt );
-        
-        spt = G_Spawn();
-        spt->classname = G_CopyString( "info_box_intermission" );
-        VectorSet( spt->s.origin, -992, 1088, -40 );  //-3500
-        ED_CallSpawn( spt );
-        
-    }*/
-
-
+ 
 // Ridah, HACK, fix spawn spots in team_towers
 	if (!strcmp( level.mapname, "team_towers" ))
 	{

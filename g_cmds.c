@@ -489,7 +489,6 @@ void Cmd_Spec_f (edict_t *self)
 	ClientBeginDeathmatch( self );
 }
 
-
 // Papa - add plater to a team
 void Cmd_Join_f (edict_t *self, char *teamcmd)
 {
@@ -2371,8 +2370,7 @@ void Cmd_Use_f (edict_t *ent)
 // Kingpin uses whatever key your weapon is bound to, to work its menus
 // So I kept with this format for the menus that I added
 
-
-	if (ent->client->showscores == SCORE_MAP_VOTE)  // next map vote menu
+    if (ent->client->showscores == SCORE_MAP_VOTE)  // next map vote menu
 	{
 		if (level.framenum > (ent->switch_teams_frame + 4))
 			if (s)
@@ -2453,7 +2451,7 @@ void Cmd_Use_f (edict_t *ent)
 		}
 		return;
 	}	
-	else if ((teamplay->value) && ((!ent->client->pers.team) || (level.modeset == MATCHSETUP) || (level.modeset == FREEFORALL)))
+	else if ((teamplay->value) && ((!ent->client->pers.team) || (level.modeset == MATCHSETUP) || (level.modeset == FINALCOUNT) || (level.modeset == FREEFORALL)))
 	{
 //		if (level.framenum > (ent->switch_teams_frame + 20)) // Kingpin's join team menu
 			if (s)
@@ -2476,6 +2474,9 @@ void Cmd_Use_f (edict_t *ent)
 		if (!teamplay->value) Cmd_Join_f( ent, "" );
 		return;
 	}
+
+  /*  if((teamplay->value) && (ent->client->pers.team>0) && (level.modeset==FINALCOUNT))
+        return;*/
 
 	it = FindItem (s);
 	if (!it)
@@ -3386,6 +3387,14 @@ void Cmd_Hud_f (edict_t *ent)
 }
 // END JOSEPH
 
+
+/*void Cmd_ForceCutScene_f (void)
+{
+	level.cut_scene_time = 1;
+}*/
+
+
+
 void Cmd_Flashlight_f (edict_t *ent)
 {
 	if (!ent->client->flashlight && ent->client->pers.inventory[ITEM_INDEX(FindItem("Flashlight"))])
@@ -3835,7 +3844,7 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 //skipnext:;
 
 	if (team && (ent->client->pers.admin > NOT_ADMIN) || (ent->client->pers.rconx[0]))
-		Com_sprintf (text, sizeof(text), ">|%s|<: ", ent->client->pers.netname);
+		Com_sprintf (text, sizeof(text), ">(%s)<: ", ent->client->pers.netname);
     else if((ent->client->pers.admin > NOT_ADMIN) || (ent->client->pers.rconx[0]))
         Com_sprintf (text, sizeof(text), ">|%s|<: ", ent->client->pers.netname);
     else if(team)
@@ -4093,7 +4102,7 @@ void Cmd_CommandList_f (edict_t *ent)
 	} else
 		cprintf(ent, PRINT_HIGH,"resetserver, changemap, maplist, cds\n");
 	cprintf(ent, PRINT_HIGH,"settimelimit, setfraglimit, setcashlimit, setidletime\n");
-	cprintf(ent, PRINT_HIGH,"team1name, team2name, toggle_asc, curselist\n");
+	cprintf(ent, PRINT_HIGH,"team1name, team2name, toggle_asc, curselist, disable_spec\n");
 	if (enable_password) cprintf(ent, PRINT_HIGH,"setpassword removepassword\n");
 	if (!fixed_gametype) {
 		cprintf(ent, PRINT_HIGH,"setdmflags, setdm_realmode, setteamplay\n");
@@ -4428,9 +4437,9 @@ void Cmd_SetClientIdle_f (edict_t *ent, char *value)
 {
 	int		i = atoi (value);
 
-	if (ent->client->pers.admin > ELECTED )
-		if (i < 60) {
-			cprintf(ent,PRINT_HIGH,"Please enter a value greater than 60 seconds\n");
+	if (ent->client->pers.admin > NOT_ADMIN )
+		if (i < 120) {
+			cprintf(ent,PRINT_HIGH,"Please enter a value greater than 120 seconds\n");
 			return;
 		} else {
 			gi.cvar_set("idle_client",value);
@@ -4438,7 +4447,7 @@ void Cmd_SetClientIdle_f (edict_t *ent, char *value)
 		}
 
 	else
-		cprintf(ent,PRINT_HIGH,"You do not have admin password.\n");
+		cprintf(ent,PRINT_HIGH,"You do not have admin\n\n");
 }
 
 void Cmd_SetFragLimit_f (edict_t *ent, char *value)
@@ -4611,6 +4620,26 @@ void Cmd_Toggle_ASC_f (edict_t *ent)
        // }
       //  else
       //      cprintf(ent,PRINT_HIGH,"No Anti-spawn camping in RealMode\n");
+    }
+	else
+		cprintf(ent,PRINT_HIGH,"You do not have admin\n");
+}
+
+void Cmd_DisableSpec_f(edict_t *ent)
+{
+    
+    if (ent->client->pers.admin > NOT_ADMIN)
+    {
+            if(no_spec->value)
+            {
+                gi.cvar_set("no_spec","0");
+                cprintf(ent,PRINT_HIGH,"Spectating is enabled!\n");
+            }
+            else
+            {
+                gi.cvar_set("no_spec","1");
+                cprintf(ent,PRINT_HIGH,"Spectating is disabled!\n");
+            }
     }
 	else
 		cprintf(ent,PRINT_HIGH,"You do not have admin\n");
@@ -4888,6 +4917,7 @@ void Cmd_Rcon_f (edict_t *ent)
             return;
         }
     }
+    // add reason code here
 	else if (!Q_stricmp(cmd,"kick")) checkkick(ent,cmd,"kicked");
     else if (!Q_stricmp(cmd,"kickban")) checkkick(ent,cmd,"kicked & banned");
 	else if (gi.argc()==2) {
@@ -5162,7 +5192,11 @@ void ClientCommand (edict_t *ent)
 #endif
                 if(!cmd3 || atof(cmd3)==0.0)
                 {
-                    if (kick_flamehack->value) KICKENT(ent,"%s is being kicked for having a flame hack!\n");
+                    if (kick_flamehack->value || (ent->client->pers.spectator==SPECTATING && no_spec->value
+                           && (level.modeset==MATCH || level.modeset==TEAMPLAY || level.modeset==FREEFORALL))) 
+                    {
+                        KICKENT(ent,"%s is being kicked for having a flame hack!\n");
+                    }
                 }
                 else if(atof(cmd3)==2.0)
                 {
@@ -5236,10 +5270,10 @@ void ClientCommand (edict_t *ent)
 	if (level.intermissiontime)
 		return;
 
-	// RAFAEL
+	// RAFAEL  
 	if (level.cut_scene_time)
 		return;
-	
+     
 	else if (level.pawn_time)
 	{
 	
@@ -5505,8 +5539,9 @@ void ClientCommand (edict_t *ent)
         Cmd_Enable_CDS_f(ent);
     else if (Q_stricmp (cmd, "toggle_asc") == 0) 
         Cmd_Toggle_ASC_f(ent);
- /*   else if (Q_stricmp (cmd, "polyblend") == 0)
-        ent->client->pers.polyblender = !ent->client->pers.polyblender;*/
+    else if (Q_stricmp (cmd, "disable_spec") == 0) 
+        Cmd_DisableSpec_f(ent);
+
 
 	//end -taunts tical
 

@@ -84,7 +84,7 @@
 #define PLAYING				0
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Monkey CDS v1.50a"
+#define	GAMEVERSION	"Monkey CDS v1.50b"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -806,6 +806,7 @@ extern	cvar_t	*bob_roll;
 
 extern	cvar_t	*sv_cheats;
 extern	cvar_t	*maxclients;
+extern	cvar_t	*no_spec;
 
 extern	cvar_t	*flood_msgs;
 extern	cvar_t	*flood_persecond;
@@ -1136,6 +1137,7 @@ void InitClientResp (gclient_t *client);
 void InitClientRespClear (gclient_t *client);
 void InitBodyQue (void);
 void ClientBeginServerFrame (edict_t *ent);
+void SV_AddBlend (float r, float g, float b, float a, float *v_blend);
 
 // RAFAEL
 void BeginCutScene (edict_t *ent);
@@ -1166,7 +1168,6 @@ void ClientEndServerFrame (edict_t *ent);
 // p_hud.c
 //
 void MoveClientToIntermission (edict_t *client);
-void MoveClientToBlackBox (edict_t *client);
 void G_SetStats (edict_t *ent);
 void ValidateSelectedItem (edict_t *ent);
 void DeathmatchScoreboard (edict_t *client);
@@ -1209,9 +1210,7 @@ void SaveClientData (void);
 void HideWeapon (edict_t *ent);
 void FetchClientEntData (edict_t *ent);
 void ErrorMSGBox(edict_t *ent, char *string);
-//void CheckBlackBox(void);
 void Cmd_Spec_f (edict_t *self);
-//edict_t *FindBlackBox(void);
 
 // 
 //	g_pawn.c

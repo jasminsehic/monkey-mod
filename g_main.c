@@ -63,6 +63,7 @@ cvar_t	*bob_pitch;
 cvar_t	*bob_roll;
 
 cvar_t	*sv_cheats;
+cvar_t	*no_spec;
 
 cvar_t	*flood_msgs;
 cvar_t	*flood_persecond;
@@ -1130,7 +1131,7 @@ void G_RunFrame (void)
 	sprintf(buf2,"%dd:%dh:%dm",uptime_days,uptime_hours,uptime_minutes);
 	gi.cvar_set("uptime",buf2);
 
-    if(idle_client->value<60)
-        gi.cvar_set("idle_client", "60");
+    if(idle_client->value<120)
+        gi.cvar_set("idle_client", "120");
 }
 
