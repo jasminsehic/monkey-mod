@@ -291,6 +291,39 @@ void SVCmd_Enable_CDS_f (void)
     
 }
 
+
+void SVCmd_Mute_f (void)
+{
+    
+       int		i;
+
+       i = atoi (gi.argv(2));
+             
+       if ((g_edicts[i+1].client==NULL) || (!gi.argv(2) || !*gi.argv(2)) || (i<0 || (i+1)>maxclients->value))
+       {
+           gi.cprintf (NULL, PRINT_HIGH,"Unable to find client id match\n");
+           gi.cprintf (NULL, PRINT_HIGH,"Usage: mute <client id>\nNOTE: client id can be seen by using the 'status' command\n");
+           return; 
+       }  
+
+       if(g_edicts[i+1].inuse)
+       {
+           if(g_edicts[i+1].client->pers.mute == 0)
+           {
+               gi.cprintf(NULL,PRINT_HIGH,"Enabled Mute On: %s\n",g_edicts[i+1].client->pers.netname);
+               gi.cprintf(&g_edicts[i+1], PRINT_HIGH, "Admin has 'muted' you\n");
+               g_edicts[i+1].client->pers.mute = 1; 
+           }
+           else
+           {
+               gi.cprintf(NULL,PRINT_HIGH,"Disabled Mute On: %s\n",g_edicts[i+1].client->pers.netname);
+               gi.cprintf(&g_edicts[i+1], PRINT_HIGH, "Admin has 'unmuted' you\n");
+               g_edicts[i+1].client->pers.mute = 0; 
+           }
+       }
+     
+}
+
 /*
 =================
 ServerCommand
@@ -319,8 +352,12 @@ void	ServerCommand (void)
 		SVCmd_Enable_CDS_f ();
     else if (!Q_stricmp(cmd,"banip")) 
         Cmd_BanDicks_f(NULL, 1);
+    else if (!Q_stricmp(cmd,"listdicks")) 
+        Cmd_ListDicks_f(NULL);
     else if (!Q_stricmp(cmd,"banname")) 
         Cmd_BanDicks_f(NULL, 0);
+    else if (!Q_stricmp(cmd,"mute")) 
+        SVCmd_Mute_f();
 	else
 		gi.cprintf (NULL, PRINT_HIGH, "Unknown server command \"%s\"\n", cmd);
 }

@@ -5,7 +5,7 @@
 #define HEADERMESSAGE\
 	"this server is running the "GAMEVERSION,\
 	"** ASUS see-thru & EXE/OpenGL/model hack detection **",\
-	"download the CDS client from www.monkeymod.com",\
+	"download the CDS client from www.poisonville.net/mm",\
 	"type PLAYERS in the console to see who's clean",
 /*#define HEADERMESSAGE\
 	"this server is running the "GAMEVERSION,\

@@ -585,3 +585,18 @@ Changes from monkey cds 1.51a to monkey cds 1.52
 
  * misc cheat fixes
 
+
+Changes from monkey cds 1.52 to monkey cds 1.52a
+================================================
+
+ * few small bug fixes
+
+
+Changes from monkey cds 1.52a to monkey cds 1.52b
+=================================================
+
+ * changed every instance of "monkeymod.com" to "poisonville.net/mm"
+
+
+
+

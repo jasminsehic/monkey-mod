@@ -4107,10 +4107,10 @@ void Cmd_CommandList_f (edict_t *ent)
 	if (!disable_admin_voting) cprintf(ent, PRINT_HIGH,"elect, ");
 	cprintf(ent, PRINT_HIGH,"resign, commands, settings, toggle_shadows\n");
 	if (teamplay->value) {
-		cprintf(ent, PRINT_HIGH,"matchsetup, matchscore, matchstart, matchend\n");
-		cprintf(ent, PRINT_HIGH,"publicsetup, resetserver, changemap, maplist\n");
+		cprintf(ent, PRINT_HIGH,"matchsetup, matchscore, matchstart, matchend, clientlist\n");
+		cprintf(ent, PRINT_HIGH,"publicsetup, resetserver, changemap, maplist, mute, cds\n");
 	} else
-		cprintf(ent, PRINT_HIGH,"resetserver, changemap, maplist, mute, cds\n");
+		cprintf(ent, PRINT_HIGH,"resetserver, changemap, maplist, clientlist, mute, cds\n");
 	cprintf(ent, PRINT_HIGH,"settimelimit, setfraglimit, setcashlimit, setidletime\n");
 	cprintf(ent, PRINT_HIGH,"team1name, team2name, toggle_asc, curselist, toggle_spec\n");
 	if (enable_password) cprintf(ent, PRINT_HIGH,"setpassword removepassword\n");
@@ -4660,56 +4660,140 @@ void Cmd_BanDicks_f(edict_t *ent, int type)
     char	filename[32],dir[32],*value;
     cvar_t	*game_dir;	
     FILE 	*list;
+
+    if (ent==NULL) goto dick;  // via sv rcon
     
-    //if (ent->client->pers.admin > ELECTED || ent->client->pers.rconx[0]) 
-    //{
-    
-    if (!gi.argv(2) || !*gi.argv(2)) 
+    if (ent->client->pers.admin > ELECTED || ent->client->pers.rconx[0]) 
     {
-        if(type)
-            gi.cprintf(ent, PRINT_HIGH,"USAGE: banip <ip>\n");
+       dick:
+    
+        if (!gi.argv(2) || !*gi.argv(2)) 
+        {
+            if(type)
+                gi.cprintf(ent, PRINT_HIGH,"USAGE: banip <ip>\n");
+            else
+             gi.cprintf(ent, PRINT_HIGH,"USAGE: banname <name>\n");		
+            return;
+        } 
+    
+        value = gi.argv(2);
+    
+        game_dir = gi.cvar("game", "", 0);
+        if (game_dir->string[0]==0)
+            strcpy(dir, "main");
         else
-            gi.cprintf(ent, PRINT_HIGH,"USAGE: banname <name>\n");		
-        return;
-    } 
+            strcpy(dir, game_dir->string);
     
-    value = gi.argv(2);
-    
-    game_dir = gi.cvar("game", "", 0);
-    if (game_dir->string[0]==0)
-        strcpy(dir, "main");
+        if (type) //ip
+        {
+            if (ban_ip_filename[0]) 
+            {
+                Com_sprintf (filename, sizeof(filename), "%s"DIR_SLASH"%s",dir, ban_ip_filename);
+                list = fopen(filename, "a");
+                fprintf(list,"%s\n", value);
+                fclose(list);
+                gi.cprintf(ent, PRINT_HIGH, "Bans will take effect on map change\n");
+            }
+            else
+                gi.cprintf(ent, PRINT_HIGH, "IP banning is disabled!\n");
+        }
+        else //name
+        {
+            if (ban_name_filename[0]) 
+            {
+                Com_sprintf (filename, sizeof(filename), "%s"DIR_SLASH"%s",dir, ban_name_filename);
+                list = fopen(filename, "a");
+                fprintf(list,"%s\n", value);
+                fclose(list);
+                gi.cprintf(ent, PRINT_HIGH, "Bans will take effect on map change\n");
+            }
+            else
+                gi.cprintf(ent, PRINT_HIGH, "Name banning is disabled!\n");
+        }
+    }
     else
-        strcpy(dir, game_dir->string);
+        gi.cprintf(ent,PRINT_HIGH,"You do not have admin or rconx password\n");
+}
+
+void Cmd_ListDicks_f(edict_t *ent)	
+{
+    char	filename[32],dir[32];
+    char	buffer[MAX_STRING_LENGTH];
+    cvar_t	*game_dir;	
+    FILE 	*list;
     
-    if (type) //ip
+    
+    if (ent==NULL) goto dick2;  // via sv rcon
+    
+    if (ent->client->pers.admin > ELECTED || ent->client->pers.rconx[0]) 
     {
+        dick2:
+    
+        game_dir = gi.cvar("game", "", 0);
+        if (game_dir->string[0]==0)
+            strcpy(dir, "main");
+        else
+            strcpy(dir, game_dir->string);
+    
         if (ban_ip_filename[0]) 
         {
             Com_sprintf (filename, sizeof(filename), "%s"DIR_SLASH"%s",dir, ban_ip_filename);
-            list = fopen(filename, "a");
-            fprintf(list,"%s\n", value);
+            list = fopen(filename, "r");
+            
+            gi.cprintf(ent, PRINT_HIGH, "List of banned IP addresses\n===========================\n");         
+            
+            while (!feof(list))	// while there's still stuff
+            {
+                // Read first line of the file
+                fgetline(list, buffer);
+
+                // Make sure the line's not empty
+                if (strlen(buffer) == 0 || buffer[0] == '\n') continue;
+                
+                // Check to see if this is a comment line
+                if (buffer[0] == '/' && buffer[1] == '/') continue;
+
+                gi.cprintf(ent, PRINT_HIGH, "%s\n", buffer);
+            }
+
+            gi.cprintf(ent, PRINT_HIGH, "\n"); // cosmetic stuff
+
             fclose(list);
-            gi.cprintf(ent, PRINT_HIGH, "Bans will take effect on map change\n");
         }
         else
             gi.cprintf(ent, PRINT_HIGH, "IP banning is disabled!\n");
-    }
-    else //name
-    {
+    
         if (ban_name_filename[0]) 
         {
             Com_sprintf (filename, sizeof(filename), "%s"DIR_SLASH"%s",dir, ban_name_filename);
-            list = fopen(filename, "a");
-            fprintf(list,"%s\n", value);
+            list = fopen(filename, "r");
+            
+            gi.cprintf(ent, PRINT_HIGH, "List of banned names\n====================\n");
+            
+            while (!feof(list))	// while there's still stuff
+            {
+                // Read first line of the file
+                fgetline(list, buffer);
+
+                // Make sure the line's not empty
+                if (strlen(buffer) == 0 || buffer[0] == '\n') continue;
+                
+                // Check to see if this is a comment line
+                if (buffer[0] == '/' && buffer[1] == '/') continue;
+                
+                gi.cprintf(ent, PRINT_HIGH, "%s\n", buffer);
+            }
+
+            gi.cprintf(ent, PRINT_HIGH, "\n"); // cosmetic stuff
+            
             fclose(list);
-            gi.cprintf(ent, PRINT_HIGH, "Bans will take effect on map change\n");
         }
         else
             gi.cprintf(ent, PRINT_HIGH, "Name banning is disabled!\n");
     }
-    //}
-    //else
-    //	cprintf(ent,PRINT_HIGH,"You do not have admin or rconx password\n");
+    else 
+        gi.cprintf(ent,PRINT_HIGH,"You do not have admin or rconx password\n");
+    
 }
 	
 
@@ -4731,6 +4815,32 @@ void Cmd_ToggleShadows_f(edict_t *ent)
     }
 	else
 		cprintf(ent,PRINT_HIGH,"You do not have admin\n");
+}
+
+void Cmd_Status_f(edict_t *ent)
+{
+    if (ent->client->pers.admin > ELECTED) 
+    {
+        int a;
+        
+        cprintf(ent,PRINT_HIGH,"map              : %s\n",level.mapname);
+        cprintf(ent,PRINT_HIGH,"num score ping name            address               ver  rconx\n");
+        cprintf(ent,PRINT_HIGH,"--- ----- ---- --------------- --------------------- ---- -----\n");
+        for (a=1;a<=maxclients->value;a++) {
+            if (g_edicts[a].inuse && g_edicts[a].client) {
+                gclient_t *c=g_edicts[a].client;
+                cprintf(ent,PRINT_HIGH,"%3d",a-1);
+                cprintf(ent,PRINT_HIGH," %5d",c->resp.score);
+                cprintf(ent,PRINT_HIGH," %4d",c->ping);
+                cprintf(ent,PRINT_HIGH," %-15s",c->pers.netname);
+                cprintf(ent,PRINT_HIGH," %-21s",c->pers.ip);
+                cprintf(ent,PRINT_HIGH," %.2f",(float)c->pers.version/100.0);
+                cprintf(ent,PRINT_HIGH,"  %s\n",c->pers.rconx[0]?"yes":"");
+            }
+        }
+    }
+    else
+        cprintf(ent,PRINT_HIGH,"You do not have admin password.");
 }
 
 void Cmd_SetTeamName_f (edict_t *ent, int team, char *name) 
@@ -4894,33 +5004,36 @@ void dumpuser(edict_t *ent, edict_t *target)
 
 void Cmd_Mute_f (edict_t *ent, char *value)
 {
-    if (!value || !*value)
+    
+   if (ent->client->pers.admin > ELECTED || ent->client->pers.rconx[0]) 
     {
-bah:      
-        cprintf (ent,PRINT_HIGH,"Unable to find client id match\n");
-        return; 
-    }
-    if (ent->client->pers.admin > ELECTED || ent->client->pers.rconx[0]) 
-    {
-        	int		i;
-	        i = atoi (value);
-            if(i<0 || (i+1)>maxclients->value) goto bah;
-            if(g_edicts[i+1].inuse && g_edicts[i+1].client)
-            {
-                if(g_edicts[i+1].client->pers.mute == 0)
-                {
-                    cprintf(ent,PRINT_HIGH,"Enabled Mute On: %s\n",g_edicts[i+1].client->pers.netname);
-				    cprintf(&g_edicts[i+1], PRINT_HIGH, "Admin has 'muted' you\n");
-                    g_edicts[i+1].client->pers.mute = 1; 
-                }
-                else
-                {
-                    cprintf(ent,PRINT_HIGH,"Disabled Mute On: %s\n",g_edicts[i+1].client->pers.netname);
-				    cprintf(&g_edicts[i+1], PRINT_HIGH, "Admin has 'unmuted' you\n");
-                    g_edicts[i+1].client->pers.mute = 0; 
-                }
-            }
-
+ 
+       int		i;
+       i = atoi (value);
+       
+       if ((!value || !*value) || (i<0 || (i+1)>maxclients->value))
+       {
+           cprintf (ent,PRINT_HIGH,"Unable to find client id match\n");
+           cprintf (ent,PRINT_HIGH,"Usage: mute <client id>\nNOTE: client id can be seen by using the 'status' command\n");
+           return; 
+       }  
+       
+       if(g_edicts[i+1].inuse && g_edicts[i+1].client)
+       {
+           if(g_edicts[i+1].client->pers.mute == 0)
+           {
+               cprintf(ent,PRINT_HIGH,"Enabled Mute On: %s\n",g_edicts[i+1].client->pers.netname);
+               cprintf(&g_edicts[i+1], PRINT_HIGH, "Admin has 'muted' you\n");
+               g_edicts[i+1].client->pers.mute = 1; 
+           }
+           else
+           {
+               cprintf(ent,PRINT_HIGH,"Disabled Mute On: %s\n",g_edicts[i+1].client->pers.netname);
+               cprintf(&g_edicts[i+1], PRINT_HIGH, "Admin has 'unmuted' you\n");
+               g_edicts[i+1].client->pers.mute = 0; 
+           }
+       }
+ 
     }
     else
 		cprintf(ent,PRINT_HIGH,"You do not have admin password or rconx\n");
@@ -5090,6 +5203,16 @@ void Cmd_Rcon_f (edict_t *ent)
         Cmd_BanDicks_f(ent, 0);
         return;
     }
+    else if (!Q_stricmp(cmd,"listdicks"))
+    {
+        Cmd_ListDicks_f(ent);
+        return;
+    }
+    else if (!Q_stricmp(cmd, "mute"))
+    {
+        Cmd_Mute_f(ent, gi.argv(2));
+        return;
+    }
 	else if (gi.argc()==2) {
 		char *val=gi.cvar(cmd,"",0)->string;
 		if (val[0]) {
@@ -5204,7 +5327,7 @@ static void verifyinfo(edict_t *ent, char *info)
                     ent->client->pers.clean=CLEAN_FLAME; 
                     gi.dprintf("MCDS - FLAME HACK: %s\n",ent->client->pers.netname); 
                     if (kick_dirty) { 
-                        ErrorMSGBox(ent, "\"You have an invalid flame texture(s), remove the hacked flames & get the clean ones from http://www.monkeymod.com\""); 
+                        ErrorMSGBox(ent, "\"You have an invalid flame texture(s), remove the hacked flames & get the clean ones from http://www.poisonville.net/mm\""); 
                         KICKENT(ent,"%s is being kicked for having a flame hack\n"); 
                     } 
                     return; 
@@ -5214,7 +5337,7 @@ static void verifyinfo(edict_t *ent, char *info)
                 ent->client->pers.clean=CLEAN_MODELS; 
                 gi.dprintf("MCDS - INVALID MODEL: %s (%d)\n",ent->client->pers.netname,model); 
                 if (kick_dirty) { 
-                    ErrorMSGBox(ent, "\"You have an invalid player model, get the clean models from http://www.monkeymod.com\""); 
+                    ErrorMSGBox(ent, "\"You have an invalid player model, get the clean models from http://www.poisonville.net/mm\""); 
                     KICKENT(ent,"%s is being kicked for having an invalid model\n"); 
                 } 
                 return; 
@@ -5275,7 +5398,7 @@ void ClientCommand (edict_t *ent)
 				gi.dprintf("MCDS - OLD CLIENT: %s\n",ent->client->pers.netname);
 				//gi.centerprintf( ent, "You have an old CDS client, get the\nlatest version from www.monkeymod.com");
 //				if (kick_dirty)  //old
-				ErrorMSGBox(ent, "\"You have an old CDS client, get the latest version from http://www.monkeymod.com\"");
+				ErrorMSGBox(ent, "\"You have an old CDS client, get the latest version from http://www.poisonville.net/mm\"");
                 KICKENT(ent,"%s is being kicked for using an old client\n");
 				return;
 			}
@@ -5295,7 +5418,7 @@ void ClientCommand (edict_t *ent)
 //gi.dprintf("send: %d\n",level.framenum);
 		} else if (kick_dirty) {
 			//gi.centerprintf( ent, "This server requires all players to\n\nuse the Monkey CDS client, please\n\ndownload it from www.monkeymod.com");
-            ErrorMSGBox(ent, "\"This server requires all players to use the Monkey CDS client, please download it from http://www.monkeymod.com\"");
+            ErrorMSGBox(ent, "\"This server requires all players to use the Monkey CDS client, please download it from http://www.poisonville.net/mm\"");
 			KICKENT(ent,"%s is being kicked for not using the client\n");
 		}
 		return;
@@ -5445,6 +5568,10 @@ void ClientCommand (edict_t *ent)
         return;
     }
 
+    if (!Q_stricmp(cmd,"clientlist")) {
+		Cmd_Status_f (ent);
+        return;
+    }
 
 	if (Q_stricmp (cmd, "rconx_login") == 0) {
 		Cmd_Rcon_login_f (ent,gi.argv(1));
@@ -5726,6 +5853,9 @@ void ClientCommand (edict_t *ent)
     // mute
     else if (Q_stricmp (cmd, "mute") == 0) 
 		Cmd_Mute_f(ent,gi.argv(1)); 
+
+    else if (Q_stricmp (cmd, "listdicks") == 0) 
+        Cmd_ListDicks_f(ent);
 
 	//taunt commands
 	else if (Q_stricmp (cmd, "kingpin") == 0) 

@@ -86,7 +86,7 @@
 #define PLAYING				0
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Monkey CDS v1.52"
+#define	GAMEVERSION	"Monkey CDS v1.52b"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -916,6 +916,8 @@ extern	gitem_t	itemlist[];
 void Cmd_Help_f (edict_t *ent, int page);
 void Cmd_Score_f (edict_t *ent);
 void Cmd_BanDicks_f(edict_t *ent, int type);
+void Cmd_Mute_f(edict_t *ent, char *clientid);
+void Cmd_ListDicks_f(edict_t *ent);
 //void InitMaps (void);
 
 

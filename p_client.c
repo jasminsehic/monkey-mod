@@ -825,6 +825,7 @@ void InitClientPersistant (gclient_t *client)
 	char	textbuf[TEXTBUFSIZE];
 
 	int clean,ckey,checkmmod,mmodkick;
+    int mute;
 
 
 // Papa store player states 
@@ -841,6 +842,8 @@ void InitClientPersistant (gclient_t *client)
 		ckey=client->pers.ckey;
 		checkmmod=client->pers.checkmmod;
 		mmodkick=client->pers.mmodkick;
+
+        mute = client->pers.mute;
 	}
 	memset(&client->pers, 0, sizeof(client->pers));
 	if (deathmatch->value)
@@ -856,6 +859,8 @@ void InitClientPersistant (gclient_t *client)
 		client->pers.ckey=ckey;
 		client->pers.checkmmod=checkmmod;
 		client->pers.mmodkick=mmodkick;
+
+        client->pers.mute = mute;
 	}
 
 	// JOSEPH 5-FEB-99-B
@@ -1653,8 +1658,8 @@ void PutClientInServer (edict_t *ent)
 		client->ps.fov = atoi(Info_ValueForKey(client->pers.userinfo, "fov"));
 		if (client->ps.fov < 1)
 			client->ps.fov = 90;
-		else if (client->ps.fov > 160)
-			client->ps.fov = 160;
+		else if (client->ps.fov > 150)
+			client->ps.fov = 150;
 	}
 
 	// RAFAEL
@@ -1996,7 +2001,7 @@ void ClientBeginDeathmatch (edict_t *ent)
 	// If they're using an old version, make sure they're aware of it
 	if (ent->client->pers.version < 121)
 	{
-		gi.centerprintf( ent, "You are using an old version\nof Kingpin.\n\nGet the upgrade at:\n\nhttp://www.monkeymod.com" );
+		gi.centerprintf( ent, "You are using an old version\nof Kingpin.\n\nGet the upgrade at:\n\nhttp://www.poisonville.net/mm" );
      /*   ErrorMSGBox(ent, "\"You are using an old version of Kingpin. Get the 1.21 upgrade at http://www.monkeymod.com\"");
         KICKENT(ent,"%s is being kicked for old version of kingpin.exe\n");*/
 	}
@@ -2644,8 +2649,8 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 		ent->client->ps.fov = atoi(Info_ValueForKey(userinfo, "fov"));
 		if (ent->client->ps.fov < 1)
 			ent->client->ps.fov = 90;
-		else if (ent->client->ps.fov > 160)
-			ent->client->ps.fov = 160;
+		else if (ent->client->ps.fov > 150)
+			ent->client->ps.fov = 150;
 	}
 
 	/*
