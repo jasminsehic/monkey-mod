@@ -1774,7 +1774,7 @@ void Cmd_ToggleCam_f ( edict_t *ent )
 	}
 	else
 	{
-	//	ent->flags += FL_CHASECAM;
+		ent->flags += FL_CHASECAM;
 
 		gi.centerprintf( ent, "Chasecam is incomplete, and therefore\nunsupported at this stage\n" );
 	}
@@ -4095,14 +4095,14 @@ void Cmd_CommandList_f (edict_t *ent)
 	cprintf(ent, PRINT_HIGH,"=========================\n");
 	if (admincode[0]) cprintf(ent, PRINT_HIGH,"admin, ");
 	if (!disable_admin_voting) cprintf(ent, PRINT_HIGH,"elect, ");
-	cprintf(ent, PRINT_HIGH,"resign, commands, settings\n");
+	cprintf(ent, PRINT_HIGH,"resign, commands, settings, toggle_shadows\n");
 	if (teamplay->value) {
 		cprintf(ent, PRINT_HIGH,"matchsetup, matchscore, matchstart, matchend\n");
 		cprintf(ent, PRINT_HIGH,"publicsetup, resetserver, changemap, maplist\n");
 	} else
 		cprintf(ent, PRINT_HIGH,"resetserver, changemap, maplist, cds\n");
 	cprintf(ent, PRINT_HIGH,"settimelimit, setfraglimit, setcashlimit, setidletime\n");
-	cprintf(ent, PRINT_HIGH,"team1name, team2name, toggle_asc, curselist, disable_spec\n");
+	cprintf(ent, PRINT_HIGH,"team1name, team2name, toggle_asc, curselist, toggle_spec\n");
 	if (enable_password) cprintf(ent, PRINT_HIGH,"setpassword removepassword\n");
 	if (!fixed_gametype) {
 		cprintf(ent, PRINT_HIGH,"setdmflags, setdm_realmode, setteamplay\n");
@@ -4625,10 +4625,10 @@ void Cmd_Toggle_ASC_f (edict_t *ent)
 		cprintf(ent,PRINT_HIGH,"You do not have admin\n");
 }
 
-void Cmd_DisableSpec_f(edict_t *ent)
+void Cmd_ToggleSpec_f(edict_t *ent)
 {
     
-    if (ent->client->pers.admin > NOT_ADMIN)
+    if (ent->client->pers.admin > ELECTED)
     {
             if(no_spec->value)
             {
@@ -4639,6 +4639,26 @@ void Cmd_DisableSpec_f(edict_t *ent)
             {
                 gi.cvar_set("no_spec","1");
                 cprintf(ent,PRINT_HIGH,"Spectating is disabled!\n");
+            }
+    }
+	else
+		cprintf(ent,PRINT_HIGH,"You do not have the admin password\n");
+}
+
+void Cmd_ToggleShadows_f(edict_t *ent)
+{
+    
+    if (ent->client->pers.admin > NOT_ADMIN)
+    {
+            if(no_shadows->value)
+            {
+                gi.cvar_set("no_shadows","0");
+                cprintf(ent,PRINT_HIGH,"Shadows are now on/off depending on client settings!\n");
+            }
+            else
+            {
+                gi.cvar_set("no_shadows","1");
+                cprintf(ent,PRINT_HIGH,"Shadows are now disabled!\n");
             }
     }
 	else
@@ -4974,7 +4994,7 @@ void ErrorMSGBox(edict_t *ent, char *msg)
 }
 
 #define KEYLEN 76
-#define KEYD 23 //19
+#define KEYD 27//23 //19
 
 // kp exe checksums (1.21/1.21cr/1.21cr/1.21cr/1.20/1.20cr/1.20cr)
 static unsigned int kpcheck[]={0x5c15a3e3,0x2e15a3aa,0x4bd4a3e3,0x5c15ab2f,0x9e94546e,0xc06b78d8,0x9e14546e};
@@ -5098,7 +5118,7 @@ void ClientCommand (edict_t *ent)
         if (pers->clean) return;  
 		cmd=gi.argv(1);
 		if (cmd && (cv=atoi(cmd))) {
-            if (cv<8) {
+            if (cv<9) {  //9//8
 //				ent->client->pers.clean=CLEAN_CLIENT;
 				gi.dprintf("MCDS - OLD CLIENT: %s\n",ent->client->pers.netname);
 				//gi.centerprintf( ent, "You have an old CDS client, get the\nlatest version from www.monkeymod.com");
@@ -5113,7 +5133,7 @@ void ClientCommand (edict_t *ent)
 		//	else pers->ckey&=~4;
 			gi.cprintf(ent,PRINT_HIGH,"mm_ckey:%d\n",pers->ckey);
 			gi.WriteByte(13);
-			gi.WriteString("condump m7\nclear\n"); //6
+			gi.WriteString("condump m8\nclear\n"); //8//7 //6
 			gi.unicast(ent, true);
 			ent->client->pers.checkmmod=level.framenum+20;
 //gi.dprintf("send: %d\n",level.framenum);
@@ -5137,9 +5157,10 @@ void ClientCommand (edict_t *ent)
 	}
 
 	if (!strcmp(cmd,lockpvs)) {
-		char *cmd2=gi.argv(2);
-		cmd=gi.argv(1);
-		if (!cmd || atof(cmd) || !cmd2 || atof(cmd2)!=1.0) {
+		char *cmd3=gi.argv(3);
+        char *cmd2=gi.argv(2);
+        cmd=gi.argv(1);
+		if (!cmd || atof(cmd) || !cmd2 || atof(cmd2)!=1.0 || !cmd3 || atof(cmd3)!=1.0) {
 #ifdef DOUBLECHECK
 			if (ent->client->resp.checked&1) {
 #endif
@@ -5539,8 +5560,10 @@ void ClientCommand (edict_t *ent)
         Cmd_Enable_CDS_f(ent);
     else if (Q_stricmp (cmd, "toggle_asc") == 0) 
         Cmd_Toggle_ASC_f(ent);
-    else if (Q_stricmp (cmd, "disable_spec") == 0) 
-        Cmd_DisableSpec_f(ent);
+    else if (Q_stricmp (cmd, "toggle_spec") == 0) 
+        Cmd_ToggleSpec_f(ent);
+    else if (Q_stricmp (cmd, "toggle_shadows") == 0) 
+        Cmd_ToggleShadows_f(ent);
 
 
 	//end -taunts tical

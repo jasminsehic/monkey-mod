@@ -1535,6 +1535,17 @@ char *teamplay_statusbar =
 "	pic 4 "
 "endif "
 
+// Begin cash
+"   xr -103 "
+"   yt 45 "
+"   string \"BAG$ \" "
+"   xr -72 "
+"   yt 41 "
+"	num	3 24 "
+
+"talk "
+//end cash
+
 // selected item
 "if 6 "
 "	xv	296 "
@@ -1580,7 +1591,7 @@ char *teamplay_statusbar =
 "endif "
 
 // Bagged cash
-"bagcash "
+//"bagcash "  //tical - taken out (gl_ztrick)
 
 // Ridah, teamplay scores (NOTE: THIS MUST BE LAST!!)
 "teams "

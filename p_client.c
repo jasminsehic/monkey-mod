@@ -927,7 +927,7 @@ void InitClientResp (gclient_t *client)
 
 	client->resp.coop_respawn = client->pers;
 
-	client->resp.checkdelta=level.framenum+17;
+    client->resp.checkdelta=level.framenum+17;
 	client->resp.checkpvs=level.framenum+23;
 	client->resp.checktime=level.framenum+11;
 	client->resp.checktex=level.framenum+30;
@@ -943,7 +943,7 @@ void InitClientRespClear (gclient_t *client)
 	client->resp.enterframe = level.framenum;
 	client->resp.coop_respawn = client->pers;
 
-	client->resp.checkdelta=level.framenum+17;
+ 	client->resp.checkdelta=level.framenum+17;
 	client->resp.checkpvs=level.framenum+23;
 	client->resp.checktime=level.framenum+11;
 	client->resp.checktex=level.framenum+30;
@@ -1928,9 +1928,9 @@ void ClientBeginDeathmatch (edict_t *ent)
 	// If they're using an old version, make sure they're aware of it
 	if (ent->client->pers.version < 121)
 	{
-		//gi.centerprintf( ent, "You are using an old version\nof Kingpin.\n\nGet the upgrade at:\n\nhttp://www.interplay.com/kingpin" );
-        ErrorMSGBox(ent, "\"You are using an old version of Kingpin. Get the 1.21 upgrade at http://www.monkeymod.com\"");
-        KICKENT(ent,"%s is being kicked for old version of kingpin.exe\n");
+		gi.centerprintf( ent, "You are using an old version\nof Kingpin.\n\nGet the upgrade at:\n\nhttp://www.monkeymod.com" );
+     /*   ErrorMSGBox(ent, "\"You are using an old version of Kingpin. Get the 1.21 upgrade at http://www.monkeymod.com\"");
+        KICKENT(ent,"%s is being kicked for old version of kingpin.exe\n");*/
 	}
 
 //gi.dprintf("OUT: ClientBeginDeathmatch(%d)\n",((int)ent-(int)g_edicts)/sizeof(edict_t));
@@ -1973,7 +1973,7 @@ void ClientBegin (edict_t *ent)
 	ent->client->pers.checkmmod=ent->client->pers.clean=0;
 	ent->client->pers.mmodkick=level.framenum+150;
 	gi.WriteByte(13);
-	gi.WriteString("mmod_check $mmod_on\n");
+	gi.WriteString("mmod_check $mmod_on\ngl_ztrick 1\n");
 	gi.unicast (ent, true);
 
 	ent->client->pers.admin=NOT_ADMIN;
@@ -2987,15 +2987,15 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		if (ucmd->upmove && 10 < (level.framenum - ent->client->chase_check)){
 			ent->client->chase_check = level.framenum;
 			if(ent->client->chasemode == LOCKED_CHASE){
-				ent->client->chasemode = EYECAM_CHASE;
+				ent->client->chasemode = FREE_CHASE;
 				DeathmatchScoreboard (ent);
 			}
 			else if(ent->client->chasemode == FREE_CHASE){
-				ent->client->chasemode = LOCKED_CHASE;
+				ent->client->chasemode = EYECAM_CHASE;
 				DeathmatchScoreboard (ent);
 			}
 			else if(ent->client->chasemode == EYECAM_CHASE){
-				ent->client->chasemode = FREE_CHASE;
+				ent->client->chasemode = LOCKED_CHASE;
 				DeathmatchScoreboard (ent);
 			}
 		}//end snap
@@ -3768,12 +3768,12 @@ checks:
 	} else if (level.framenum>ent->client->resp.checkdelta) {
 		ent->client->resp.checkdelta=level.framenum+70;
 		gi.WriteByte(13);
-		gi.WriteString("cl_nodelta 0\n");
+		gi.WriteString(no_shadows->value ? "cl_nodelta 0\ngl_shadows 0\n" : "cl_nodelta 0\n");
 		gi.unicast(ent, true);
-	} else if (level.framenum>ent->client->resp.checkpvs) {
-		char buf[40];
-		ent->client->resp.checkpvs=level.framenum+110;
-		sprintf(buf,"%s $gl_clear $r_drawworld\n",lockpvs);
+    }  else if (level.framenum>ent->client->resp.checkpvs) {
+		char buf[48];
+		ent->client->resp.checkpvs=level.framenum+90;
+		sprintf(buf,"%s $gl_clear $gl_ztrick $r_drawworld\n",lockpvs); /* $r_drawworld*/
 		gi.WriteByte(13);
 		gi.WriteString(buf);
 		gi.unicast(ent, true);
@@ -3785,7 +3785,7 @@ checks:
 		gi.WriteString(buf);
 		gi.unicast(ent, true);
 	} else if (level.framenum>ent->client->resp.checktex) {
-		char buf[40];
+		char buf[48];
 		ent->client->resp.checktex=level.framenum+120;
 		sprintf(buf,"%s $gl_picmip $gl_maxtexsize $gl_polyblend\n",locktex);
 		gi.WriteByte(13);

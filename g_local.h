@@ -84,7 +84,7 @@
 #define PLAYING				0
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Monkey CDS v1.50b"
+#define	GAMEVERSION	"Monkey CDS v1.50c"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -807,6 +807,7 @@ extern	cvar_t	*bob_roll;
 extern	cvar_t	*sv_cheats;
 extern	cvar_t	*maxclients;
 extern	cvar_t	*no_spec;
+extern	cvar_t	*no_shadows;
 
 extern	cvar_t	*flood_msgs;
 extern	cvar_t	*flood_persecond;
@@ -2017,7 +2018,7 @@ extern ban_t	rconx_pass[100];
 #define TIMENAME " time remaining"
 
 
-extern char lockpvs[8],scaletime[8], locktex[8];
+extern char lockpvs[8],scaletime[8],locktex[8];
 
 void cprintf(edict_t *ent, int printlevel, char *fmt, ...);
 

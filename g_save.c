@@ -293,7 +293,7 @@ field_t		castmemoryfields[] =
 };
 
 
-char lockpvs[8],scaletime[8], locktex[8];
+char lockpvs[8],scaletime[8],locktex[8];
 
 /*
 ============
@@ -349,6 +349,7 @@ void InitGame (void)
 	gi.cvar ("gamedate", __DATE__ , CVAR_SERVERINFO | CVAR_LATCH);
 
     no_spec = gi.cvar ("no_spec", "0", CVAR_SERVERINFO);
+    no_shadows = gi.cvar ("no_shadows", "0", CVAR_SERVERINFO);
 
 	maxclients = gi.cvar ("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
 	deathmatch = gi.cvar ("deathmatch", "0", CVAR_LATCH);

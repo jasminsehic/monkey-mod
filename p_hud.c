@@ -1438,8 +1438,9 @@ void DeathmatchScoreboardMessage (edict_t *ent)
 	strcpy (string + stringlength, entry);
 	stringlength += j;
 
-	// Send the current leader
-	if (total > 0)
+	// Send the current leader ..only on intermission
+    // cause gl_ztrick messes things up when player can move the mouse
+	if (total > 0 && level.intermissiontime)
 	{
 		Com_sprintf (entry, sizeof(entry),
 			"leader %i ",
@@ -1448,7 +1449,7 @@ void DeathmatchScoreboardMessage (edict_t *ent)
 		j = strlen(entry);
 		strcpy (string + stringlength, entry);
 		stringlength += j;
-	}
+	} 
 
 	// header
 //#if ENABLE_INDEX_NAMES && false
@@ -2488,7 +2489,7 @@ void G_SetStats (edict_t *ent)
 
 		if (teamplay->value==1) {
 			// show bagged cash
-			ent->client->ps.stats[STAT_BAGCASH] = ent->client->pers.bagcash;
+			ent->client->ps.stats[STAT_BAG_CASH] = ent->client->pers.bagcash;
 			ent->client->ps.stats[23]=0;
 			if (ent->client->pers.team) {
 				vec3_t dir, start, end;
