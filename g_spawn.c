@@ -18,6 +18,7 @@ void SP_info_player_start (edict_t *ent);
 void SP_info_player_deathmatch (edict_t *ent);
 void SP_info_player_coop (edict_t *ent);
 void SP_info_player_intermission (edict_t *ent);
+void SP_info_box_intermission (edict_t *ent);
 
 void SP_func_plat (edict_t *ent);
 void SP_func_rotating (edict_t *ent);
@@ -157,6 +158,7 @@ void SP_func_subdoor_handle2 (edict_t *ent);
 void SP_props_trashcanA (edict_t *ent);
 void SP_props_trashcan_fall (edict_t *ent);
 void SP_props_hydrant (edict_t *ent);
+void SP_black_box (edict_t *ent);
 void SP_props_antenna1a (edict_t *self);
 void SP_props_antenna2a (edict_t *self);
 void SP_props_antenna3a (edict_t *self);
@@ -370,6 +372,7 @@ spawn_t	spawns[] = {
 	{"info_player_deathmatch", SP_info_player_deathmatch},
 	{"info_player_coop", SP_info_player_coop},
 	{"info_player_intermission", SP_info_player_intermission},
+    {"info_box_intermission", SP_info_box_intermission},
 
 	{"func_plat", SP_func_plat},
 	{"func_button", SP_func_button},
@@ -550,7 +553,8 @@ spawn_t	spawns[] = {
 	{"func_subdoor_handle2", SP_func_subdoor_handle2},
 	{"props_trashcanA", SP_props_trashcanA},
 	{"props_trashcan_fall", SP_props_trashcan_fall},
-	{"props_hydrant", SP_props_hydrant},
+	{"black_box", SP_black_box},
+    {"props_hydrant", SP_props_hydrant},
     {"props_antenna1a", SP_props_antenna1a},
     {"props_antenna1b", SP_props_antenna1b},
     {"props_antenna1c", SP_props_antenna1c},
@@ -1061,9 +1065,15 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 
 	time_t t;
 	time(&t);
+
+    
+    //check if box exists
+    //CheckBlackBox();
+    //tical
+
 	gi.dprintf("%s",ctime(&t));
 
-
+    
 	skill_level = floor (skill->value);
 	if (skill_level < 0)
 		skill_level = 0;
@@ -1183,6 +1193,22 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 
 		ED_CallSpawn (ent);
 	}	
+
+    //tical - black box
+   /* {
+        edict_t *spt;
+        
+        spt = G_Spawn();
+        spt->classname = G_CopyString( "black_box" );
+        VectorSet( spt->s.origin, 992, 1088, -40 ); //-3500
+        ED_CallSpawn( spt );
+        
+        spt = G_Spawn();
+        spt->classname = G_CopyString( "info_box_intermission" );
+        VectorSet( spt->s.origin, -992, 1088, -40 );  //-3500
+        ED_CallSpawn( spt );
+        
+    }*/
 
 
 // Ridah, HACK, fix spawn spots in team_towers

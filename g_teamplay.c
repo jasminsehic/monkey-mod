@@ -313,7 +313,7 @@ void safebag_touch( edict_t *self, edict_t *other, cplane_t *plane, csurface_t *
 	else if (team_cash[self->style] > 0)
 	{	// withdrawal
 
-		if (other->client->pers.bagcash < MAX_BAGCASH_PLAYER)
+        if (other->client->pers.bagcash < MAX_BAGCASH_PLAYER)
 		{
 			int	precash, amount;
 

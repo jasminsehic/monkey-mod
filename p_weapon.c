@@ -120,6 +120,9 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 	//other->client->pers.inventory[index]++;
 	other->client->pers.inventory[index] = 1;
 
+    //if they pick weapon up make them mortal
+    other->client->invincible_framenum = 0;
+
 	if (ent->item->ammo && !(ent->spawnflags & DROPPED_ITEM) )
 	{
 		// give them some ammo with it
@@ -398,7 +401,8 @@ void ChangeWeapon (edict_t *ent)
 				ent->client->ps.model_parts[PART_GUN].skinnum[i] = 0; // will we have more than one skin???		
 			*/
 
-			ent->client->ps.num_parts++;
+			//posible conflict - tical
+            ent->client->ps.num_parts++;
 			ent->client->ps.model_parts[PART_GUN2].modelindex = gi.modelindex("models/weapons/v_rocket_launcher/clip.mdx");
 			for (i=0; i<MAX_MODELPART_OBJECTS; i++)
 				ent->client->ps.model_parts[PART_GUN2].skinnum[i] = 0; // will we have more than one skin???		

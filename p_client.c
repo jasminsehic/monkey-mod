@@ -180,6 +180,10 @@ void SP_info_player_intermission(void)
 {
 }
 
+void SP_info_box_intermission(void)
+{
+}
+
 
 //=======================================================================
 
@@ -418,6 +422,10 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 			if (message)
 			{
 				gi.bprintf (PRINT_MEDIUM,"%s %s %s%s\n", self->client->pers.netname, message, attacker->client->pers.netname, message2);
+                if(enable_killerhealth)
+                {   
+                   gi.cprintf (self, PRINT_HIGH,"%s had %i health!\n", attacker->client->pers.netname, attacker->health);
+                }
 				if ((deathmatch->value) && (mod != MOD_RESTART) && (mod != MOD_TELEFRAG))
 				{
 					if (ff)
@@ -566,7 +574,7 @@ extern void VelocityForDamage (int damage, vec3_t v);
 
 void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point, int mdx_part, int mdx_subobject)
 {
-	int		n, health;
+	int		n;//, health;
 
 	VectorClear (self->avelocity);
 
@@ -574,6 +582,9 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	self->movetype = MOVETYPE_TOSS;
 
 //	self->s.modelindex2 = 0;	// remove linked weapon model
+    //tical
+//    self->s.modelindex3 = 0;
+
 	self->s.model_parts[PART_GUN].modelindex = 0;
 
 	self->s.renderfx2 &= ~RF2_FLAMETHROWER;
@@ -598,7 +609,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 		self->client->ps.pmove.pm_type = PM_DEAD;
 		ClientObituary (self, inflictor, attacker);
 		
-		if (enable_killerhealth)
+/*		if (enable_killerhealth)
 		{
 			if(attacker->client && attacker!=self)
 			{
@@ -606,7 +617,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 				if(((unsigned int)attacker->health>100)||((unsigned int)attacker->health<0)) health=0;
 				cprintf(self,PRINT_CHAT,"%s had %u health!\n", attacker->client->pers.netname, health);
 			}
-		}
+		}*/
 //		sl_WriteStdLogDeath( &gi, level, self, inflictor, attacker);	// Standard Logging
 
 		if (meansOfDeath!=MOD_RESTART)
@@ -1536,6 +1547,11 @@ void PutClientInServer (edict_t *ent)
 	ent->s.renderfx2 = 0;
 	ent->onfiretime = 0;
 
+    //give 3 seconds of imortality on each spawn (anti-camp) if not RM & is enabled
+    if(atoi(gi.cvar("anti_spawncamp", "", 0)->string))
+        if(!(deathmatch->value && dm_realmode->value))
+            ent->client->invincible_framenum = level.framenum + 30;
+
 	ent->cast_info.aiflags |= AI_GOAL_RUN;	// make AI run towards us if in pursuit
 
 	VectorCopy (mins, ent->mins);
@@ -1584,6 +1600,7 @@ void PutClientInServer (edict_t *ent)
 		for (i=0; i<MAX_MODELPART_OBJECTS; i++)
 			client->ps.model_parts[PART_HEAD].skinnum[i] = 0; // will we have more than one skin???
 	}
+
 
 	if (client->pers.weapon)
 		client->ps.gunindex = gi.modelindex(client->pers.weapon->view_model);
@@ -1693,6 +1710,8 @@ ent->bikestate = 0;
 
 		s =Info_ValueForKey (client->pers.userinfo, "skin");
 
+        //gi.bprintf(PRINT_HIGH, "Working ... 1\n");
+
 //		skins = strstr( s, "/" ) + 1;
 
 		// converts some characters to NULL's
@@ -1747,16 +1766,25 @@ ent->bikestate = 0;
 		gi.GetObjectBounds( modelname, &ent->s.model_parts[ent->s.num_parts-1] );
 		if (!ent->s.model_parts[ent->s.num_parts-1].object_bounds[0])
 			gi.GetObjectBounds( "players/male_thug/body.mdx", &ent->s.model_parts[ent->s.num_parts-1] );
+        
+        ent->s.num_parts++;
+        ent->s.model_parts[PART_GUN].modelindex = 255;
 
-		ent->s.num_parts++;
-		ent->s.model_parts[PART_GUN].modelindex = 255;
-	}
+    }
 	else	// make sure we can see their weapon
 	{
-		memset(&(ent->s.model_parts[0]), 0, sizeof(model_part_t) * MAX_MODEL_PARTS);
+		//gi.bprintf(PRINT_HIGH, "Working ... 2\n");
+        memset(&(ent->s.model_parts[0]), 0, sizeof(model_part_t) * MAX_MODEL_PARTS);
 		ent->s.model_parts[PART_GUN].modelindex = 255;
 		ent->s.num_parts = PART_GUN+1;	// make sure old clients recieve the view weapon index
-	}
+
+        //tical
+        //ent->s.num_parts++;
+        //ent->s.model_parts[PART_GUN2].modelindex = 255;
+        //gi.GetObjectBounds("models/props/flag/flag1.mdx", &ent->s.model_parts[ent->s.num_parts-1] );
+        //gi.modelindex("models/props/flag/flag1.mdx");
+    }
+
 
 	// set the delta angle
 	for (i=0 ; i<3 ; i++)
@@ -1892,7 +1920,9 @@ void ClientBeginDeathmatch (edict_t *ent)
 	// If they're using an old version, make sure they're aware of it
 	if (ent->client->pers.version < 121)
 	{
-		gi.centerprintf( ent, "You are using an old version\nof Kingpin.\n\nGet the upgrade at:\n\nhttp://www.interplay.com/kingpin" );
+		//gi.centerprintf( ent, "You are using an old version\nof Kingpin.\n\nGet the upgrade at:\n\nhttp://www.interplay.com/kingpin" );
+        ErrorMSGBox(ent, "\"You are using an old version of Kingpin. Get the upgrade at http://www.monkeymod.com\"");
+        KICKENT(ent,"%s is being kicked for old version of kingpin.exe\n");
 	}
 
 //gi.dprintf("OUT: ClientBeginDeathmatch(%d)\n",((int)ent-(int)g_edicts)/sizeof(edict_t));
@@ -1948,14 +1978,16 @@ void ClientBegin (edict_t *ent)
 				if (!player->inuse) continue;
 				if (player->client->pers.admin>NOT_ADMIN) {
 					gi.cvar_set("modadmin","");
+                    gi.cvar_set("admintype","");
 					break;
 				}
 			}
 			if (i==maxclients->value) {
 				if (!strcmp(a,ent->client->pers.ip)) {
-					gi.cvar_set("modadmin","");
-					ent->client->pers.admin = ELECTED;
-					gi.bprintf(PRINT_HIGH,"%s is now admin.\n",ent->client->pers.netname);
+					ent->client->pers.admin = atoi(gi.cvar("admintype", "", 0)->string);
+                    gi.cvar_set("modadmin","");
+                    gi.cvar_set("admintype","");
+                    gi.bprintf(PRINT_HIGH,"%s is now admin.\n",ent->client->pers.netname);
 				}
 			}
 		}
@@ -2324,19 +2356,17 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
     {
         // start - Standard Logging
         // Has the player got a name
-/*        if( strlen(ent->client->pers.netname) )
+        if( strlen(ent->client->pers.netname) )
         {
             // has the name changed
             if( strcmp( ent->client->pers.netname, s ) )
             {
                 // Standard Logging -  log player rename
-                sl_LogPlayerRename( &gi,
-                                    ent->client->pers.netname,
-                                    s,
-                                    level.time );
+                //sl_LogPlayerRename( &gi, ent->client->pers.netname, s, level.time );
+                gi.bprintf(PRINT_HIGH, "%s changed name to %s\n", ent->client->pers.netname, s);
             }
         }
-*/        // end - Standard Logging
+        // end - Standard Logging
 
         strncpy (ent->client->pers.netname, s, sizeof(ent->client->pers.netname)-1);
     }
@@ -2656,6 +2686,7 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 			ent->client->pers.textbuf[0]=0;
 
 			ent->client->pers.clean=0;
+            ent->client->pers.polyblender=0;
 
 			InitClientPersistant (ent->client);
 		}
@@ -3349,7 +3380,11 @@ chasing:
 		other->touch (other, ent, NULL, NULL);
 	}
 
-	// JOSEPH 22-JAN-99
+    //they shoot...they are mortal
+    if (((client->latched_buttons|client->buttons) & BUTTON_ATTACK))
+        client->invincible_framenum = 0;
+
+    // JOSEPH 22-JAN-99
 	// Activate button is pressed
 	if (((client->latched_buttons|client->buttons) & BUTTON_ACTIVATE))
 	{
@@ -3691,7 +3726,7 @@ checks:
 	} else if (level.framenum>ent->client->resp.checktex) {
 		char buf[40];
 		ent->client->resp.checktex=level.framenum+120;
-		sprintf(buf,"%s $gl_picmip $gl_maxtexsize\n",locktex);
+		sprintf(buf,"%s $gl_picmip $gl_maxtexsize $gl_polyblend\n",locktex);
 		gi.WriteByte(13);
 		gi.WriteString(buf);
 		gi.unicast(ent, true);

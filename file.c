@@ -100,6 +100,9 @@ int proccess_line(char*	buffer)
 	if (strstr(buffer, RCONX_FILE_STRING))
 		return RCONX_FILE_KEYWORD;
 
+/*    if (strstr(buffer, URL_STRING))
+		return URL_KEYWORD;*/
+
 	if (strstr(buffer, KEEP_ADMIN_STRING))
 		return KEEP_ADMIN_KEYWORD;
 
@@ -114,6 +117,15 @@ int proccess_line(char*	buffer)
 
 	if (strstr(buffer, DISABLE_CURSE_STRING))
 		return DISABLE_CURSE_KEYWORD;
+
+    if (strstr(buffer, UNLIMITED_CURSE_STRING))
+		return UNLIMITED_CURSE_KEYWORD;
+
+    if (strstr(buffer, DISABLE_ASC_STRING))
+		return DISABLE_ASC_KEYWORD;
+
+    if (strstr(buffer, ENABLE_NOFLAMEHACK_CHECK_STRING))
+		return ENABLE_NOFLAMEHACK_CHECK_KEYWORD;
 
 	if (strstr(buffer, ENABLE_SEE_KILLER_HEALTH_STRING))
 		return ENABLE_SEE_KILLER_HEALTH_KEYWORD;
@@ -145,6 +157,7 @@ int proccess_ini_file()
 	ban_name_filename[0]=0;
 	ban_ip_filename[0]=0;
 	rconx_file[0]=0;
+//    server_url[0]=0;
 
 	// Set number of custom/rotation maps to 0
 //	game.num_rmaps = 0;
@@ -162,7 +175,9 @@ int proccess_ini_file()
 	disable_anon_text = false;
 	kick_dirty = false;
 	disable_curse = false;
-	enable_killerhealth = false;
+    unlimited_curse = false;
+//    enable_asc = false;
+ 	enable_killerhealth = false;
 
 
 	// Open config file
@@ -267,6 +282,10 @@ int proccess_ini_file()
 			sscanf(buffer, "%s %s", dummy, map);	// Quick ugly hack :)
 			strncpy(rconx_file, map, 32);
 			break;
+ /*       case URL_KEYWORD:
+			sscanf(buffer, "%s %s", dummy, map);	// Quick ugly hack :)
+			strncpy(server_url, map, 64);
+			break;*/
 		case KEEP_ADMIN_KEYWORD:
 			keep_admin_status = true;
 			break;
@@ -282,6 +301,17 @@ int proccess_ini_file()
 			break;
 		case DISABLE_CURSE_KEYWORD:
 			disable_curse = true;
+			break;
+        case UNLIMITED_CURSE_KEYWORD:
+			unlimited_curse = true;
+			break;
+        case DISABLE_ASC_KEYWORD:
+		//	enable_asc = true;
+            gi.cvar_set("anti_spawncamp", "1");
+			break;
+         case ENABLE_NOFLAMEHACK_CHECK_KEYWORD:
+			//noflamehackcheck = true;
+            gi.cvar_set("kick_flamehack", "1");
 			break;
 		case ENABLE_SEE_KILLER_HEALTH_KEYWORD:
 			enable_killerhealth = true;

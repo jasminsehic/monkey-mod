@@ -135,7 +135,7 @@ void UpdateChaseCam(edict_t *ent)
 	}
 
 	ent->viewheight = 0;
-	ent->client->ps.pmove.pm_flags |= PMF_NO_PREDICTION;
+    ent->client->ps.pmove.pm_flags |= PMF_NO_PREDICTION;
 	gi.linkentity(ent);
 }
 
@@ -144,6 +144,11 @@ void ChaseNext(edict_t *ent)
 {
 	int i;
 	edict_t *e;
+
+
+    //tical -- testing blackbox
+//    MoveClientToBlackBox(ent);
+//    return;
 
 	if (!ent->client->chase_target)
 	{

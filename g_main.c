@@ -68,6 +68,9 @@ cvar_t	*flood_msgs;
 cvar_t	*flood_persecond;
 cvar_t	*flood_waitdelay;
 
+cvar_t  *kick_flamehack;
+cvar_t  *anti_spawncamp;
+
 // Ridah, new cvar's
 cvar_t	*developer;
 cvar_t	*ai_debug_memory;
@@ -159,11 +162,18 @@ void ShutdownGame (void)
 			if (!ent->inuse) continue;
 			if (ent->client->pers.admin>NOT_ADMIN) {
 				gi.cvar_set("modadmin",ent->client->pers.ip);
+                if(ent->client->pers.admin==ELECTED)
+                    gi.cvar_set("admintype", "1");
+                else if(ent->client->pers.admin==ADMIN)
+                    gi.cvar_set("admintype", "2");
 				break;
 			}
 		}
 		if (i==maxclients->value)
+        {
 			gi.cvar_set("modadmin","");
+            gi.cvar_set("admintype","");
+        }
 	}
 	
 	sprintf(buf1,"%d",uptime_days);
@@ -443,7 +453,7 @@ void EndDMLevel (void)
 		ent = G_Spawn ();
 		ent->classname = "target_changelevel";
 		ent->map = nextmap;
-		gi.bprintf (PRINT_HIGH, "Next map will be: %s.\n", ent->map);
+//		gi.bprintf (PRINT_HIGH, "Next map will be: %s.\n", ent->map);
 	
 		goto done;
 	}
@@ -620,17 +630,22 @@ void ExitLevel (void)
 	if (keep_admin_status) {
 		for (i=0 ; i<maxclients->value ; i++) {
 			ent = g_edicts + 1 + i;
-			if (!ent->inuse)
-				continue;
+			if (!ent->inuse) continue;
 			if (ent->client->pers.admin>NOT_ADMIN) {
 				gi.cvar_set("modadmin",ent->client->pers.ip);
+                if(ent->client->pers.admin==ELECTED)
+                    gi.cvar_set("admintype", "1");
+                else if(ent->client->pers.admin==ADMIN)
+                    gi.cvar_set("admintype", "2");
 				break;
 			}
 		}
 		if (i==maxclients->value)
+        {
 			gi.cvar_set("modadmin","");
+            gi.cvar_set("admintype","");
+        }
 	}
-	//gi.bprintf(PRINT_HIGH, "next is %s\n", level.changemap);
 
 	Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.changemap);
 	gi.AddCommandString (command);

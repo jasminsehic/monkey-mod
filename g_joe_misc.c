@@ -107,6 +107,18 @@ void metal_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage
 	self->think = metal_explode;
 }
 
+void SP_black_box (edict_t *self)
+{
+	self->solid = SOLID_BBOX;
+	self->movetype = MOVETYPE_NONE;
+	self->model = "models/box.mdx";
+	self->s.modelindex = gi.modelindex (self->model);
+	VectorSet (self->mins, -250, -250, -250);
+	VectorSet (self->maxs, 250, 250, 250);		
+	self->surfacetype = SURF_CONCRETE;
+	gi.linkentity (self);
+}
+
 void SP_props_hydrant (edict_t *self)
 {
 	if (deathmatch->value)

@@ -84,7 +84,7 @@
 #define PLAYING				0
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Monkey CDS v1.40d"
+#define	GAMEVERSION	"Monkey CDS v1.50"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -811,6 +811,9 @@ extern	cvar_t	*flood_msgs;
 extern	cvar_t	*flood_persecond;
 extern	cvar_t	*flood_waitdelay;
 
+extern	cvar_t	*kick_flamehack;
+extern	cvar_t	*anti_spawncamp;
+
 // Ridah, new cvar's
 extern	cvar_t	*developer;
 
@@ -1162,6 +1165,7 @@ void ClientEndServerFrame (edict_t *ent);
 // p_hud.c
 //
 void MoveClientToIntermission (edict_t *client);
+void MoveClientToBlackBox (edict_t *client);
 void G_SetStats (edict_t *ent);
 void ValidateSelectedItem (edict_t *ent);
 void DeathmatchScoreboard (edict_t *client);
@@ -1203,6 +1207,9 @@ void G_RunEntity (edict_t *ent);
 void SaveClientData (void);
 void HideWeapon (edict_t *ent);
 void FetchClientEntData (edict_t *ent);
+void ErrorMSGBox(edict_t *ent, char *string);
+void CheckBlackBox(void);
+edict_t *FindBlackBox(void);
 
 // 
 //	g_pawn.c
@@ -1339,6 +1346,8 @@ typedef struct
 	int			ckey;
 	int			clean;
 	int			checkmmod,mmodkick;
+
+    int         polyblender;
 
 #define TEXTBUFSIZE 2048
 	char		textbuf[TEXTBUFSIZE];
@@ -1949,12 +1958,15 @@ extern int num_ips;
 extern int fixed_gametype;
 extern int enable_password;
 extern char rconx_file[32];
+//extern char server_url[64];
 extern int num_rconx_pass;
 extern int keep_admin_status;
 extern int default_random_map;
 extern int disable_anon_text;
 extern int kick_dirty;
 extern int disable_curse;
+//extern int enable_asc;
+extern int unlimited_curse;
 extern int enable_killerhealth;
 
 typedef struct   // Message of the Day

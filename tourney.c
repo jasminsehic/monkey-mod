@@ -26,12 +26,15 @@ int num_ips;
 int fixed_gametype;
 int enable_password;
 char rconx_file[32];
+//char server_url[64];
 int num_rconx_pass;
 int keep_admin_status;
 int default_random_map;
 int disable_anon_text;
 int kick_dirty;
 int disable_curse;
+//int enable_asc;
+int unlimited_curse;
 int enable_killerhealth;
 
 MOTD_t	MOTD[20];

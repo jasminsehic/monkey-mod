@@ -19,11 +19,15 @@
 #define		FIXED_GAMETYPE_STRING	"fixed_gametype"
 #define		ENABLE_PASSWORD_STRING	"enable_password"
 #define		RCONX_FILE_STRING		"rconx_file"
+//#define		URL_STRING	        	"server_url"
 #define		KEEP_ADMIN_STRING		"keep_admin_status"
 #define		DEFAULT_RANDOM_MAP_STRING	"default_random_map"
 #define		DISABLE_ANON_TEXT_STRING	"disable_anon_text"
 #define		KICK_DIRTY_STRING		"kick_dirty"
 #define		DISABLE_CURSE_STRING	"disable_curse"
+#define		UNLIMITED_CURSE_STRING	"unlimited_curse"
+#define		DISABLE_ASC_STRING	    "disable_asc"
+#define		ENABLE_NOFLAMEHACK_CHECK_STRING	    "kick_flamehack"
 #define		ENABLE_SEE_KILLER_HEALTH_STRING	"enable_killerhealth"
 
 #define		MAX_STRING_LENGTH	100
@@ -62,6 +66,10 @@
 #define		KICK_DIRTY_KEYWORD			27
 #define		DISABLE_CURSE_KEYWORD		28
 #define		ENABLE_SEE_KILLER_HEALTH_KEYWORD 29
+#define		UNLIMITED_CURSE_KEYWORD		30
+//#define		URL_KEYWORD			        31
+#define     DISABLE_ASC_KEYWORD          32
+#define     ENABLE_NOFLAMEHACK_CHECK_KEYWORD  33
 
 #define		STANDBY					0
 #define		ADD_CUSTOM				1

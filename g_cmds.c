@@ -19,6 +19,7 @@ extern int memalloced[3];
 #define CLEAN_OPENGL	6
 #define CLEAN_MODELS	7
 #define CLEAN_TIMED		8
+#define CLEAN_FLAME     9
 
 //tical - define taunts
 #define KINGPIN		1
@@ -1676,59 +1677,71 @@ void Cmd_Key_f (edict_t *ent, int who)
 	
 	cmd = gi.argv (0);
 
-	if (key_ent = GetKeyEnt( ent ))
+    key_ent = GetKeyEnt( ent );
+
+	//if (key_ent = GetKeyEnt( ent ))
 	{
 		void Cmd_Wave_f (edict_t *ent, edict_t *other, int who);
 		cast_memory_t *mem;
 
 		if (deathmatch->value)
 		{
+            if(unlimited_curse)key_ent=NULL;
+            else
+            {
+                if(!key_ent)return;
+            }
 			Cmd_Wave_f( ent, key_ent, who );
+            if(unlimited_curse)
+                level.speaktime = level.time + 7;
 			return;
 		}
-
-		// JOSEPH 18-FEB-99 
-		ent->client->ps.stats[STAT_HUD_SELF_TALK] = TT_COMMAND;
-		ent->client->hud_self_talk_time = level.time + 2.0;
-		// END JOSEPH	
-
-		mem = level.global_cast_memory[key_ent->character_index][ent->character_index];
-
-		if (!mem)
-			return;
-
-		if (mem->memory_type == MEMORY_TYPE_FRIEND)
-		{	// issuing an order
-
-			Cmd_Order_f( ent, key_ent, cmd );
-
-			if (key_ent->targetname)
-				key_ent->targetname = 0;
-			if (key_ent->spawnflags & 2)
-				key_ent->spawnflags &=~ 2;
-			
-		}
-		else if (mem->response)		// we're responding to a question
-		{
-			response_t resp;
-
-			if (Q_stricmp (cmd, "key1") == 0)
-				resp = resp_yes;
-			else if (Q_stricmp (cmd, "key3") == 0)
-				resp = resp_no;
-
-			mem->response( ent, key_ent, resp );
-
-		}
-		else	// normal discussion
-		{
-	
-			Cmd_Speech_f ( ent, key_ent, cmd );
-
-		}
+        if(key_ent)
+        {
+            // JOSEPH 18-FEB-99 
+            ent->client->ps.stats[STAT_HUD_SELF_TALK] = TT_COMMAND;
+            ent->client->hud_self_talk_time = level.time + 2.0;
+            // END JOSEPH	
+            
+            mem = level.global_cast_memory[key_ent->character_index][ent->character_index];
+            
+            if (!mem)
+                return;
+            
+            if (mem->memory_type == MEMORY_TYPE_FRIEND)
+            {	// issuing an order
+                
+                Cmd_Order_f( ent, key_ent, cmd );
+                
+                if (key_ent->targetname)
+                    key_ent->targetname = 0;
+                if (key_ent->spawnflags & 2)
+                    key_ent->spawnflags &=~ 2;
+                
+            }
+            else if (mem->response)		// we're responding to a question
+            {
+                response_t resp;
+                
+                if (Q_stricmp (cmd, "key1") == 0)
+                    resp = resp_yes;
+                else if (Q_stricmp (cmd, "key3") == 0)
+                    resp = resp_no;
+                
+                mem->response( ent, key_ent, resp );
+                
+            }
+            else	// normal discussion
+            {
+                
+                Cmd_Speech_f ( ent, key_ent, cmd );
+                
+            }
+        }
 
 	}
-	else	// noone to talk to, so make it an order in case anyone's listening
+    if(!key_ent)
+	//else	// noone to talk to, so make it an order in case anyone's listening
 	{
 		int flags;
 
@@ -1745,7 +1758,7 @@ void Cmd_Key_f (edict_t *ent, int who)
 	}
 
 
-	level.speaktime = level.time + 1.0;
+	level.speaktime = level.time + 7;
 
 }
 
@@ -1760,7 +1773,7 @@ void Cmd_ToggleCam_f ( edict_t *ent )
 	}
 	else
 	{
-//		ent->flags += FL_CHASECAM;
+	//	ent->flags += FL_CHASECAM;
 
 		gi.centerprintf( ent, "Chasecam is incomplete, and therefore\nunsupported at this stage\n" );
 	}
@@ -2553,7 +2566,7 @@ void Cmd_Drop_f (edict_t *ent)
 	{
 		if (strcmp (it->pickup_name, "Pistol") == 0)
 		{
-			gi.dprintf ("silencer_shots: %d\n", ent->client->pers.silencer_shots);
+			//gi.dprintf ("silencer_shots: %d\n", ent->client->pers.silencer_shots);
 
 			if (!ent->client->pers.silencer_shots)
 			{
@@ -2789,7 +2802,7 @@ void Cmd_Activate_f (edict_t *ent)
 			{
 				if (!ent->client->chase_target)
 				{
-					ent->client->chasemode = FREE_CHASE;  // snap
+					ent->client->chasemode = EYECAM_CHASE;  // snap
 					ent->client->chase_check = level.framenum;
 					ChaseNext(ent);
 				}
@@ -3656,11 +3669,15 @@ void Cmd_Wave_f (edict_t *ent, edict_t *other, int who)
 
 	cmd = gi.argv(0);
 
-	if (!other->client)
-		return;
-
-	if (!ent->solid)
-		return;
+    
+    if(other!=NULL)
+    {
+        if (!other->client)
+            return;
+        
+        if (!ent->solid)
+            return;
+    }
 
 	// can't wave when ducked
 	if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
@@ -4030,7 +4047,7 @@ void Cmd_CommandList_f (edict_t *ent)
 		cprintf(ent, PRINT_HIGH,"publicsetup, resetserver, changemap, maplist\n");
 	} else
 		cprintf(ent, PRINT_HIGH,"resetserver, changemap, maplist, cds\n");
-	cprintf(ent, PRINT_HIGH,"settimelimit, setfraglimit, setcashlimit\n");
+	cprintf(ent, PRINT_HIGH,"settimelimit, setfraglimit, setcashlimit, toggle_asc\n");
 	cprintf(ent, PRINT_HIGH,"team1name, team2name, clearme, curselist\n");
 	if (enable_password) cprintf(ent, PRINT_HIGH,"setpassword removepassword\n");
 	if (!fixed_gametype) {
@@ -4487,8 +4504,34 @@ void Cmd_SetTeamplay_f (edict_t *ent, char *value)
 
 void Cmd_ResetServer_f (edict_t *ent)
 {
-	if (ent->client->pers.admin > NOT_ADMIN ) 
+	if (ent->client->pers.admin > NOT_ADMIN || ent->client->pers.rconx[0]) 
 		ResetServer();
+	else
+		cprintf(ent,PRINT_HIGH,"You do not have admin or rconx\n");
+}
+
+void Cmd_Toggle_ASC_f (edict_t *ent)
+{
+    
+    if (ent->client->pers.admin > NOT_ADMIN)
+    {
+        if(!(deathmatch->value && dm_realmode->value))
+        {
+            if(atoi(gi.cvar("anti_spawncamp", "", 0)->string))
+            {
+                gi.cvar_set("anti_spawncamp", "0");
+                cprintf(ent,PRINT_HIGH,"Anti-spawn camping is off!\n");
+            }
+            else
+            {
+                gi.cvar_set("anti_spawncamp", "1");
+                cprintf(ent,PRINT_HIGH,"Anti-spawn camping is on!\n");
+            }
+                
+        }
+        else
+            cprintf(ent,PRINT_HIGH,"No Anti-spawn camping in RealMode\n");
+    }
 	else
 		cprintf(ent,PRINT_HIGH,"You do not have admin\n");
 }
@@ -4517,7 +4560,6 @@ void Cmd_SetTeamName_f (edict_t *ent, int team, char *name)
 	else 
 		cprintf(ent,PRINT_HIGH,"You do not have admin\n"); 
 } 
-
 
 //===================================================================================
 //===================================================================================
@@ -4575,6 +4617,8 @@ void Cmd_Resign_f (edict_t *ent)
 
 	}
 }
+
+
 
 //===================================================================================
 //===================================================================================
@@ -4765,7 +4809,7 @@ void Cmd_Rcon_f (edict_t *ent)
         }
     }
 	else if (!Q_stricmp(cmd,"kick")) checkkick(ent,cmd,"kicked");
-	else if (!Q_stricmp(cmd,"kickban")) checkkick(ent,cmd,"kicked & banned");
+    else if (!Q_stricmp(cmd,"kickban")) checkkick(ent,cmd,"kicked & banned");
 	else if (gi.argc()==2) {
 		char *val=gi.cvar(cmd,"",0)->string;
 		if (val[0]) {
@@ -4807,8 +4851,19 @@ void Cmd_Rcon_login_f (edict_t *ent, char *pass)
 	cprintf(ent,PRINT_HIGH,"Successfully logged in\n");
 }
 
+//must pass a quoted string (otherwise only first word will be displayed)
+void ErrorMSGBox(edict_t *ent, char *msg)
+{
+    char *errmsg;
+    
+    errmsg = strcat("error ", msg);
+    gi.WriteByte(13);
+    gi.WriteString(errmsg);
+    gi.unicast(ent, true);
+}
+
 #define KEYLEN 76
-#define KEYD 19
+#define KEYD 23 //19
 
 // kp exe checksums (1.21/1.21cr/1.21cr/1.21cr/1.20/1.20cr/1.20cr)
 static unsigned int kpcheck[]={0x5c15a3e3,0x2e15a3aa,0x4bd4a3e3,0x5c15ab2f,0x9e94546e,0xc06b78d8,0x9e14546e};
@@ -4817,6 +4872,7 @@ static void verifyinfo(edict_t *ent, char *info)
 {
 	int a,b,c,k;
 	char s[KEYLEN+3],key[KEYLEN+3];
+    char *acvar;
 
 //	gi.dprintf("info %d %s\n",ent->client->pers.ckey,info);
 
@@ -4861,14 +4917,30 @@ static void verifyinfo(edict_t *ent, char *info)
 			return;
 		}
 		p++;
-		if (*p!='*') {
-			ent->client->pers.clean=CLEAN_MODELS;
-			gi.dprintf("MCDS - INVALID MODEL: %s (%d)\n",ent->client->pers.netname,atoi(p));
-			if (kick_dirty) {
-				KICKENT(ent,"%s is being kicked for having an invalid model\n");
-			}
-			return;
-		}
+        if (*p!='*') { 
+            int model=atoi(p); 
+            if (model==51 || model==52) { 
+                acvar=gi.cvar("kick_flamehack","",0)->string;
+                if (acvar[0]) { 
+                    ent->client->pers.clean=CLEAN_FLAME; 
+                    gi.dprintf("MCDS - FLAME HACK: %s\n",ent->client->pers.netname); 
+                    if (kick_dirty) { 
+                        ErrorMSGBox(ent, "\"You have an invalid flame texture(s), remove the hacked flames & get the clean ones from http://www.monkeymod.com\""); 
+                        KICKENT(ent,"%s is being kicked for having a flame hack\n"); 
+                    } 
+                    return; 
+                } 
+                p+=2; 
+            } else { 
+                ent->client->pers.clean=CLEAN_MODELS; 
+                gi.dprintf("MCDS - INVALID MODEL: %s (%d)\n",ent->client->pers.netname,model); 
+                if (kick_dirty) { 
+                    ErrorMSGBox(ent, "\"You have an invalid player model, get the clean models from http://www.monkeymod.com\""); 
+                    KICKENT(ent,"%s is being kicked for having an invalid model\n"); 
+                } 
+                return; 
+            } 
+        } 
 		a=atoi(p+1);
 		c=0;
 		b=ent->client->pers.version;
@@ -4891,6 +4963,7 @@ static void verifyinfo(edict_t *ent, char *info)
 }
 
 
+
 /*
 =================
 ClientCommand
@@ -4899,7 +4972,7 @@ ClientCommand
 
 void ClientCommand (edict_t *ent)
 {
-	char	*cmd;
+	char	*cmd, *a;
 	client_persistant_t *pers;
 
 	if (!ent->client)
@@ -4911,16 +4984,18 @@ void ClientCommand (edict_t *ent)
 	pers=&(ent->client->pers);
 	cmd = gi.argv(0);
 
-	if (!pers->clean && !strcmp(cmd,"mmod_check")) {
+   	if (!pers->clean && !strcmp(cmd,"mmod_check")) {
 		int cv;
+        if (pers->clean) return;  
 		cmd=gi.argv(1);
 		if (cmd && (cv=atoi(cmd))) {
-			if (cv<7) {
+            if (cv<8) {  //7
 //				ent->client->pers.clean=CLEAN_CLIENT;
 				gi.dprintf("MCDS - OLD CLIENT: %s\n",ent->client->pers.netname);
-				gi.centerprintf( ent, "You have an old CDS client, get the\nlatest version from www.monkeymod.com");
-//				if (kick_dirty)
-					KICKENT(ent,"%s is being kicked for using an old client\n");
+				//gi.centerprintf( ent, "You have an old CDS client, get the\nlatest version from www.monkeymod.com");
+//				if (kick_dirty)  //old
+				ErrorMSGBox(ent, "\"You have an old CDS client, get the latest version from http://www.monkeymod.com\"");
+                KICKENT(ent,"%s is being kicked for using an old client\n");
 				return;
 			}
 			gi.dprintf("requesting MCDS data: %s (%d)\n",ent->client->pers.netname,cv);
@@ -4929,12 +5004,13 @@ void ClientCommand (edict_t *ent)
 		//	else pers->ckey&=~4;
 			gi.cprintf(ent,PRINT_HIGH,"mm_ckey:%d\n",pers->ckey);
 			gi.WriteByte(13);
-			gi.WriteString("condump m6\nclear\n");
+			gi.WriteString("condump m7\nclear\n"); //6
 			gi.unicast(ent, true);
 			ent->client->pers.checkmmod=level.framenum+20;
 //gi.dprintf("send: %d\n",level.framenum);
 		} else if (kick_dirty) {
-			gi.centerprintf( ent, "This server requires all players to\n\nuse the Monkey CDS client, please\n\ndownload it from www.monkeymod.com");
+			//gi.centerprintf( ent, "This server requires all players to\n\nuse the Monkey CDS client, please\n\ndownload it from www.monkeymod.com");
+            ErrorMSGBox(ent, "\"This server requires all players to use the Monkey CDS client, please download it from http://www.monkeymod.com\"");
 			KICKENT(ent,"%s is being kicked for not using the client\n");
 		}
 		return;
@@ -4995,13 +5071,21 @@ void ClientCommand (edict_t *ent)
 	}
 
 	if (!strcmp(cmd,locktex)) {
+        char *cmd3=gi.argv(3);
         char *cmd2=gi.argv(2);
 		cmd=gi.argv(1);
-		if (!cmd || atof(cmd)!=0.0 || !cmd2 || atof(cmd2)<16.0) {
+		if (!cmd || atof(cmd)!=0.0 || !cmd2 || atof(cmd2)<16.0 || !cmd3 || atof(cmd3)!=1.0) {
 #ifdef DOUBLECHECK
 			if (ent->client->resp.checked&3) {
 #endif
-				KICKENT(ent,"%s is being kicked for using a texture cheat!\n");
+                if(!cmd3 || atof(cmd3)!=1.0)
+                {
+                    a=gi.cvar("kick_flamehack","",0)->string;
+                    if (a[0]) KICKENT(ent,"%s is being kicked for having a flame hack!\n");
+                   //ent->client->pers.polyblender = 1;
+                }
+                else
+                    KICKENT(ent,"%s is being kicked for using a texture cheat!\n");
 #ifdef DOUBLECHECK
 			} else {
 				ent->client->resp.checked|=3;
@@ -5331,9 +5415,12 @@ void ClientCommand (edict_t *ent)
 		Cmd_Key_f (ent,0);
 	else if (strstr (cmd, "taunt") == cmd)
 		Cmd_Key_f (ent,0);
-
-    else if (strstr (cmd, "cds") == cmd)
+    else if (Q_stricmp (cmd, "cds") == 0) 
         Cmd_Enable_CDS_f(ent);
+    else if (Q_stricmp (cmd, "toggle_asc") == 0) 
+        Cmd_Toggle_ASC_f(ent);
+    else if (Q_stricmp (cmd, "polyblend") == 0)
+        ent->client->pers.polyblender = !ent->client->pers.polyblender;
 
 	//end -taunts tical
 
@@ -5358,5 +5445,4 @@ void ClientCommand (edict_t *ent)
 	else	// anything that doesn't match a command will be a chat
 	    Cmd_Say_f (ent, false, true);
 		//cprintf(ent,PRINT_HIGH,"Unknown command!\n");
-
 }

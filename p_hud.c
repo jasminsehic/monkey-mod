@@ -124,6 +124,7 @@ void MoveClientToIntermission (edict_t *ent)
 
 }
 
+
 void BeginIntermission (edict_t *targ, char *changenext)
 {
 	int		i, n;

@@ -399,6 +399,9 @@ void InitGame (void)
 	flood_persecond = gi.cvar ("flood_persecond", "4", 0);
 	flood_waitdelay = gi.cvar ("flood_waitdelay", "10", 0);
 
+    kick_flamehack = gi.cvar ("kick_flamehack", "0", CVAR_SERVERINFO);
+    anti_spawncamp = gi.cvar ("anti_spawncamp", "1", 0);
+
 // Ridah, new cvar's
 	developer = gi.cvar ("developer", "0", 0);
 

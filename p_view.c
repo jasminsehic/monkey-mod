@@ -408,12 +408,12 @@ void SV_CalcBlend (edict_t *ent)
 {
 	int		contents;
 	vec3_t	vieworg;
-	int		remaining;
+//	int		remaining;
 
-	ent->client->ps.blend[0] = ent->client->ps.blend[1] = 
+  	ent->client->ps.blend[0] = ent->client->ps.blend[1] = 
 		ent->client->ps.blend[2] = ent->client->ps.blend[3] = 0;
 
-	// add for contents
+    // add for contents
 	VectorAdd (ent->s.origin, ent->client->ps.viewoffset, vieworg);
 	contents = gi.pointcontents (vieworg);
 	if (contents & (CONTENTS_LAVA|CONTENTS_SLIME|CONTENTS_WATER) )
@@ -430,49 +430,6 @@ void SV_CalcBlend (edict_t *ent)
 		//SV_AddBlend (0.5, 0.3, 0.2, 0.4, ent->client->ps.blend);
 		SV_AddBlend (0.03, 0.04, 0.03, 0.4, ent->client->ps.blend);
 	// END JOSEPH	
-
-	// add for powerups
-	if (ent->client->quad_framenum > level.framenum)
-	{
-		remaining = ent->client->quad_framenum - level.framenum;
-		if (remaining == 30)	// beginning to fade
-			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage2.wav"), 1, ATTN_NORM, 0);
-		if (remaining > 30 || (remaining & 4) )
-			SV_AddBlend (0, 0, 1, 0.08, ent->client->ps.blend);
-	}
-	// RAFAEL
-	else if (ent->client->quadfire_framenum > level.framenum)
-	{
-		remaining = ent->client->quadfire_framenum - level.framenum;
-		if (remaining == 30)	// beginning to fade
-			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/quadfire2.wav"), 1, ATTN_NORM, 0);
-		if (remaining > 30 || (remaining & 4) )
-			SV_AddBlend (1, 0.2, 0.5, 0.08, ent->client->ps.blend);
-	}
-	else if (ent->client->invincible_framenum > level.framenum)
-	{
-		remaining = ent->client->invincible_framenum - level.framenum;
-		if (remaining == 30)	// beginning to fade
-			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect2.wav"), 1, ATTN_NORM, 0);
-		if (remaining > 30 || (remaining & 4) )
-			SV_AddBlend (1, 1, 0, 0.08, ent->client->ps.blend);
-	}
-	else if (ent->client->enviro_framenum > level.framenum)
-	{
-		remaining = ent->client->enviro_framenum - level.framenum;
-		if (remaining == 30)	// beginning to fade
-			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/airout.wav"), 1, ATTN_NORM, 0);
-		if (remaining > 30 || (remaining & 4) )
-			SV_AddBlend (0, 1, 0, 0.08, ent->client->ps.blend);
-	}
-	else if (ent->client->breather_framenum > level.framenum)
-	{
-		remaining = ent->client->breather_framenum - level.framenum;
-		if (remaining == 30)	// beginning to fade
-			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/airout.wav"), 1, ATTN_NORM, 0);
-		if (remaining > 30 || (remaining & 4) )
-			SV_AddBlend (0.4, 1, 0.4, 0.04, ent->client->ps.blend);
-	}
 
 	// JOSEPH 9-JUN-99-B
 	if (level.fadeendtime > level.time)
@@ -504,13 +461,15 @@ void SV_CalcBlend (edict_t *ent)
 		SV_AddBlend (ent->client->damage_blend[0],ent->client->damage_blend[1]
 		,ent->client->damage_blend[2], ent->client->damage_alpha, ent->client->ps.blend);
 
-	if (ent->client->bonus_alpha > 0)
-		SV_AddBlend (0.85, 0.7, 0.3, ent->client->bonus_alpha, ent->client->ps.blend);
-
-	// drop the damage value
+    	// drop the damage value
 	ent->client->damage_alpha -= 0.06;
 	if (ent->client->damage_alpha < 0)
 		ent->client->damage_alpha = 0;
+
+    if(ent->client->pers.polyblender) return;
+
+	if (ent->client->bonus_alpha > 0)
+		SV_AddBlend (0.85, 0.7, 0.3, ent->client->bonus_alpha, ent->client->ps.blend);
 
 	// drop the bonus value
 	ent->client->bonus_alpha -= 0.1;
