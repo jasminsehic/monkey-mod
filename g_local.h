@@ -84,7 +84,7 @@
 #define PLAYING				0
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Monkey CDS v1.50c"
+#define	GAMEVERSION	"Monkey CDS v1.51"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -504,6 +504,9 @@ typedef struct
 	int		voteframe;  // startframe of the vote
 	int		is_spawn;  
 	int		player_num; 
+
+    // snap - team tags
+	int		manual_tagset;
 
 } level_locals_t;
 
@@ -942,6 +945,7 @@ void Think_FlashLight (edict_t *ent);
 qboolean	KillBox (edict_t *ent);
 void	G_ProjectSource (vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result);
 edict_t *G_Find (edict_t *from, int fieldofs, char *match);
+void G_ClearUp (edict_t *from, int fieldofs);
 edict_t *findradius (edict_t *from, vec3_t org, float rad);
 edict_t *G_PickTarget (char *targetname);
 void	G_UseTargets (edict_t *ent, edict_t *activator);
@@ -1379,7 +1383,7 @@ typedef struct
 
 	int			accshot,acchit,fav[8];
 
-	int			checkdelta,checkpvs,checktime,checktex;
+	int			checkdelta,checkpvs,checktime,checktex,checkfoot;
 #ifdef DOUBLECHECK
 	int			checked;
 #endif
@@ -2009,6 +2013,13 @@ extern ban_t	ip[100];
 
 extern ban_t	rconx_pass[100];
 
+// snap - team tags
+#define TEAMNAME " team names"
+#define UPDATETEAM {\
+	char buf[48];\
+	sprintf(buf,"%s : %s",team_names[1],team_names[2]);\
+	gi.cvar_set(TEAMNAME,buf);\
+}
 #define SCORENAME " team scores"
 #define UPDATESCORE {\
 	char buf[16];\
@@ -2018,7 +2029,7 @@ extern ban_t	rconx_pass[100];
 #define TIMENAME " time remaining"
 
 
-extern char lockpvs[8],scaletime[8],locktex[8];
+extern char lockpvs[8],scaletime[8],locktex[8],lockfoot[8];
 
 void cprintf(edict_t *ent, int printlevel, char *fmt, ...);
 

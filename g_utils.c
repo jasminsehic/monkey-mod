@@ -49,6 +49,35 @@ edict_t *G_Find (edict_t *from, int fieldofs, char *match)
 
 
 /*
+=============
+G_ClearUp
+=============
+*/
+void G_ClearUp (edict_t *from, int fieldofs)
+{
+	char	*s;
+
+	if (!from)
+		from = g_edicts;
+	else
+		from++;
+
+	for ( ; from < &g_edicts[globals.num_edicts] ; from++)
+	{
+		if (!from->inuse)
+			continue;
+		s = *(char **) ((byte *)from + fieldofs);
+		if (!s)
+			continue;
+		if (from->nextthink)
+            if (from->nextthink > level.time)
+                from->nextthink = level.time;
+	}
+
+}
+
+
+/*
 =================
 findradius
 

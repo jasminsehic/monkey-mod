@@ -293,7 +293,7 @@ field_t		castmemoryfields[] =
 };
 
 
-char lockpvs[8],scaletime[8],locktex[8];
+char lockpvs[8],scaletime[8],locktex[8],lockfoot[8];
 
 /*
 ============
@@ -380,6 +380,10 @@ void InitGame (void)
 
 	gi.cvar("rconx", "", 0);
 	gi.cvar("modadmin","", 0);
+
+    // snap - team tags
+	gi.cvar(TEAMNAME, "", CVAR_SERVERINFO);
+	gi.cvar_set(TEAMNAME,"");
 
 	gi.cvar(SCORENAME, "", CVAR_SERVERINFO);
 	gi.cvar_set(SCORENAME,"");
@@ -510,6 +514,8 @@ void InitGame (void)
 	scaletime[i]=0;
 	for (i=0;i<7;i++) locktex[i]='a'+(rand()%26);
 	locktex[i]=0;
+    for (i=0;i<7;i++) lockfoot[i]='a'+(rand()%26);
+    lockfoot[i]=0;
 }
 
 //=========================================================

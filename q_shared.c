@@ -10,6 +10,13 @@ vec3_t vec3_origin = {0,0,0};
 #pragma optimize( "", off )
 #endif
 
+#ifdef __MWERKS__
+long _ftol(float f)
+{
+    return ( long ) (f);
+}
+#endif
+
 void vectoangles (vec3_t value1, vec3_t angles)
 {
 	float	forward;

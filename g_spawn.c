@@ -1145,7 +1145,23 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 		// remove things (except the world) from different skill levels or deathmatch
 		if (ent != g_edicts)
 		{
-			if (deathmatch->value)
+            //snap - fragman fix
+            if (teamplay->value!=1)
+            {
+                if ((!strcmp(ent->classname,"dm_cashspawn"))
+                    ||(!strcmp(ent->classname,"dm_safebag"))
+                    ||(!strcmp(ent->classname,"item_cashbagsmall"))
+                    ||(!strcmp(ent->classname,"item_cashroll"))
+                    ||(!strcmp(ent->classname,"item_cashbaglarge"))
+                    ) 
+                {
+                    G_FreeEdict (ent);
+                    inhibit++;
+                    continue;
+                }
+            }
+            
+            if (deathmatch->value)
 			{
 				if (!strcmp(ent->classname,"info_player_deathmatch")) {
 					if ((!strcmp(level.mapname,"kpdm5") && VectorCompare(ent->s.origin,spawnvecs[0]))
@@ -1536,7 +1552,7 @@ char *teamplay_statusbar =
 "endif "
 
 // Begin cash
-"   xr -103 "
+/*"   xr -103 "
 "   yt 45 "
 "   string \"BAG$ \" "
 "   xr -72 "
@@ -1544,7 +1560,7 @@ char *teamplay_statusbar =
 "	num	3 24 "
 
 "talk "
-//end cash
+//end cash*/
 
 // selected item
 "if 6 "
@@ -1591,7 +1607,7 @@ char *teamplay_statusbar =
 "endif "
 
 // Bagged cash
-//"bagcash "  //tical - taken out (gl_ztrick)
+"bagcash "  //tical - taken out (gl_ztrick)
 
 // Ridah, teamplay scores (NOTE: THIS MUST BE LAST!!)
 "teams "

@@ -1472,6 +1472,7 @@ void droptofloor (edict_t *ent)
 
 	v = tv(0,0,-128);
 	VectorAdd (ent->s.origin, v, dest);
+    
 
 	tr = gi.trace (ent->s.origin, ent->mins, ent->maxs, dest, ent, MASK_SOLID);
 	if (tr.startsolid)

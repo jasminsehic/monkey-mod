@@ -654,7 +654,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 
 		// drop cash if we have some
 		// Papa - fixed bug where you didn't drop cash if you killed yourself
-		if (deathmatch->value  && (!self->client->pers.friendly_vulnerable))
+		if (deathmatch->value  && (!self->client->pers.friendly_vulnerable) && (teamplay->value==1))  //snap - fragman fix
 		{
 			edict_t *cash;
 
@@ -931,6 +931,7 @@ void InitClientResp (gclient_t *client)
 	client->resp.checkpvs=level.framenum+23;
 	client->resp.checktime=level.framenum+11;
 	client->resp.checktex=level.framenum+30;
+    client->resp.checkfoot=level.framenum+25;
 
 #ifdef DOUBLECHECK
 	client->resp.checked=0;
@@ -945,6 +946,7 @@ void InitClientRespClear (gclient_t *client)
 
  	client->resp.checkdelta=level.framenum+17;
 	client->resp.checkpvs=level.framenum+23;
+    client->resp.checkfoot=level.framenum+25;
 	client->resp.checktime=level.framenum+11;
 	client->resp.checktex=level.framenum+30;
 #ifdef DOUBLECHECK
@@ -1973,7 +1975,7 @@ void ClientBegin (edict_t *ent)
 	ent->client->pers.checkmmod=ent->client->pers.clean=0;
 	ent->client->pers.mmodkick=level.framenum+150;
 	gi.WriteByte(13);
-	gi.WriteString("mmod_check $mmod_on\ngl_ztrick 1\n");
+	gi.WriteString("mmod_check $mmod_on\n"); //gl_ztrick 1\n");
 	gi.unicast (ent, true);
 
 	ent->client->pers.admin=NOT_ADMIN;
@@ -3771,9 +3773,16 @@ checks:
 		gi.WriteString(no_shadows->value ? "cl_nodelta 0\ngl_shadows 0\n" : "cl_nodelta 0\n");
 		gi.unicast(ent, true);
     }  else if (level.framenum>ent->client->resp.checkpvs) {
-		char buf[48];
+		char buf[40];
 		ent->client->resp.checkpvs=level.framenum+90;
-		sprintf(buf,"%s $gl_clear $gl_ztrick $r_drawworld\n",lockpvs); /* $r_drawworld*/
+		sprintf(buf,"%s $gl_clear $r_drawworld\n",lockpvs); /* $gl_ztrick */
+		gi.WriteByte(13);
+		gi.WriteString(buf);
+		gi.unicast(ent, true);
+    }  else if (level.framenum>ent->client->resp.checkfoot) {
+		char buf[40];
+		ent->client->resp.checkpvs=level.framenum+50;
+		sprintf(buf,"%s $cl_forwardspeed $cl_sidespeed\n",lockfoot); 
 		gi.WriteByte(13);
 		gi.WriteString(buf);
 		gi.unicast(ent, true);

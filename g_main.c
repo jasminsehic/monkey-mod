@@ -1134,5 +1134,9 @@ void G_RunFrame (void)
 
     if(idle_client->value<120)
         gi.cvar_set("idle_client", "120");
+
+    // snap - team tags
+	if(teamplay->value)
+		UPDATETEAM
 }
 

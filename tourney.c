@@ -148,6 +148,8 @@ void MatchStart()  // start the match
 	team_cash[2]=team_startcash[1]; team_startcash[1]=0;
 	UPDATESCORE
 
+    G_ClearUp (NULL, FOFS(classname));
+
 	for_each_player (self,i)
 	{
 		self->client->pers.bagcash = 0;
@@ -463,13 +465,17 @@ void CheckStartPub () // 35 second countdown before server starts
 		gi.bprintf(PRINT_HIGH,"The Server will start in %d seconds!\n", (340 - (level.framenum )) / 10);
 }
 
-
+void getTeamTags();
 void CheckEndMatch () // check if time,frag,cash limits have been reached in a match
 {
 	int			i;
 	int		count=0;
 	edict_t	*doot;
 
+    // snap - team tags
+	if(level.framenum % 100 == 0 && !level.manual_tagset){
+		getTeamTags();
+	}
 
 	for_each_player (doot,i)
 		count++;
@@ -594,16 +600,25 @@ int	CheckNameBan (char *name)
 
 int	CheckPlayerBan (char *userinfo)
 {
-	char	*value;
-	int		i,j;
-	int		isSame;
+	char	*value, *test;
+	int		i;
+    char    temp[22];
 
 	value = Info_ValueForKey (userinfo, "name");
 	if (CheckNameBan(value))
 		return true;
 
-	value = Info_ValueForKey (userinfo, "ip");
-	for (i=0;i<num_ips;i++) {
+    value = Info_ValueForKey (userinfo, "ip");
+	
+    strcpy(temp, value);
+    test = strrchr(temp,':');
+    test[0]='\0';
+
+    for (i=0;i<num_ips;i++)
+		if (strstr(temp, ip[i].value))
+				return true;
+    
+/*    for (i=0;i<num_ips;i++) {
 		isSame = true;
 		j = 0;
 		while ((isSame) && (value[j] != '\0') && (value[j] != ':'))
@@ -614,8 +629,115 @@ int	CheckPlayerBan (char *userinfo)
 		}
 		if (isSame)
 			return true;
-	}
+	}*/
 
 	return false;
+}
+
+/////////////////////////////////////////////////////
+// snap - team tags
+void setTeamName (int team, char *name) // tical's original code :D
+{ 
+	if (!name || !*name) return; 
+
+	if (strlen(name)<16 && name[0]!=' ') 
+	{
+		if(memalloced[team])
+			free(team_names[team]);
+
+		team_names[team] = (char *)malloc(16);
+		if(team_names[team]!=NULL){
+			memalloced[team] = 1;
+			sprintf(team_names[team], "%s", name);
+		}
+	}
+}
+// snap - new function.
+void getTeamTags(){
+
+	int			i;
+	edict_t		*doot;
+	char		names[2][64][16];
+	int			namesLen[2] = { 0, 0 };
+	char		teamTag[2][12];
+	int			teamTagsFound[2]= { FALSE, FALSE };
+
+	for_each_player (doot,i){
+		int team = doot->client->pers.team;
+		if(team && namesLen[team-1] < 64){
+			strcpy(names[team-1][namesLen[team-1]++], doot->client->pers.netname);
+		}
+	}
+
+
+	for(i=0;i<2;i++){
+		int	j;
+		for(j=0;j<namesLen[i] && teamTagsFound[i] == FALSE;j++){
+			int	k;
+			for(k=0;k<namesLen[i] && j != k && teamTagsFound[i] == FALSE;k++){
+				char theTag[12];
+				int	theTagNum = 0;
+				int	y = 0;
+				char s = names[i][j][y];
+					
+				while(s != '\0' && theTagNum == 0){
+					int	z = 0;
+					char t = names[i][k][z];
+					while(t != '\0'){
+						if(s == t && s != ' '){ // we have a matched char
+							int	posY = y+1;
+							int	posZ = z+1;
+							char ss = names[i][j][posY];
+							char tt = names[i][k][posZ];
+
+							while(ss != '\0' && tt != '\0' && ss == tt && theTagNum < 11){
+								if(theTagNum == 0){ // we have two consecutive matches, this is a tag
+									theTag[theTagNum++] = s;
+									theTag[theTagNum++] = ss;
+								}
+								else{
+									theTag[theTagNum++] = ss;
+								}
+								ss = names[i][j][++posY];
+								tt = names[i][k][++posZ];
+							}
+						}
+						t = names[i][k][++z];
+					}
+					s = names[i][j][++y];
+				}
+				if(theTagNum > 0){
+					int	e;
+					float howmany = 0.0;
+					float percentage; 
+					theTag[theTagNum] = '\0';
+					
+					for(e=0;e<namesLen[i];e++){
+						if(strstr(names[i][e],theTag) != NULL){
+							howmany += 1.0;
+						}
+					}
+					percentage = howmany/(float)namesLen[i]*100.0;
+					if(percentage > 75.0){
+						strcpy(teamTag[i],theTag);
+						teamTagsFound[i] = TRUE;
+					}	
+				}
+			}
+		}
+	}
+
+
+	for(i=0;i<2;i++){
+		if(teamTagsFound[i] == TRUE){
+			setTeamName(i+1,teamTag[i]);
+		}
+		else if(i==0){
+			setTeamName(i+1, "Dragons");
+		}
+		else if(i==1){
+			setTeamName(i+1, "Nikki's Boyz");
+		}
+	}
 }
 

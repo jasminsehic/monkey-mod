@@ -139,6 +139,10 @@ extern long Q_ftol( float f );
 #define Q_ftol( f ) ( long ) (f)
 #endif
 
+#ifdef __MWERKS__
+long _ftol(float f);
+#endif
+
 void vectoangles (vec3_t value1, vec3_t angles);
 
 // JOSEPH 6-NOV-98

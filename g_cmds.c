@@ -1774,7 +1774,7 @@ void Cmd_ToggleCam_f ( edict_t *ent )
 	}
 	else
 	{
-		ent->flags += FL_CHASECAM;
+	//	ent->flags += FL_CHASECAM;
 
 		gi.centerprintf( ent, "Chasecam is incomplete, and therefore\nunsupported at this stage\n" );
 	}
@@ -3843,7 +3843,7 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 
 //skipnext:;
 
-	if (team && (ent->client->pers.admin > NOT_ADMIN) || (ent->client->pers.rconx[0]))
+	if (team && ((ent->client->pers.admin > NOT_ADMIN) || (ent->client->pers.rconx[0])))
 		Com_sprintf (text, sizeof(text), ">(%s)<: ", ent->client->pers.netname);
     else if((ent->client->pers.admin > NOT_ADMIN) || (ent->client->pers.rconx[0]))
         Com_sprintf (text, sizeof(text), ">|%s|<: ", ent->client->pers.netname);
@@ -4645,6 +4645,64 @@ void Cmd_ToggleSpec_f(edict_t *ent)
 		cprintf(ent,PRINT_HIGH,"You do not have the admin password\n");
 }
 
+void Cmd_BanDicks_f(edict_t *ent, int type)	
+{
+    char	filename[32],dir[32],*value;
+    cvar_t	*game_dir;	
+    FILE 	*list;
+    
+    //if (ent->client->pers.admin > ELECTED || ent->client->pers.rconx[0]) 
+    //{
+    
+    if (!gi.argv(2) || !*gi.argv(2)) 
+    {
+        if(type)
+            gi.cprintf(ent, PRINT_HIGH,"USAGE: banip <ip>\n");
+        else
+            gi.cprintf(ent, PRINT_HIGH,"USAGE: banname <name>\n");		
+        return;
+    } 
+    
+    value = gi.argv(2);
+    
+    game_dir = gi.cvar("game", "", 0);
+    if (game_dir->string[0]==0)
+        strcpy(dir, "main");
+    else
+        strcpy(dir, game_dir->string);
+    
+    if (type) //ip
+    {
+        if (ban_ip_filename[0]) 
+        {
+            Com_sprintf (filename, sizeof(filename), "%s"DIR_SLASH"%s",dir, ban_ip_filename);
+            list = fopen(filename, "a");
+            fprintf(list,"%s\n", value);
+            fclose(list);
+            gi.cprintf(ent, PRINT_HIGH, "Bans will take effect on map change\n");
+        }
+        else
+            gi.cprintf(ent, PRINT_HIGH, "IP banning is disabled!\n");
+    }
+    else //name
+    {
+        if (ban_name_filename[0]) 
+        {
+            Com_sprintf (filename, sizeof(filename), "%s"DIR_SLASH"%s",dir, ban_name_filename);
+            list = fopen(filename, "a");
+            fprintf(list,"%s\n", value);
+            fclose(list);
+            gi.cprintf(ent, PRINT_HIGH, "Bans will take effect on map change\n");
+        }
+        else
+            gi.cprintf(ent, PRINT_HIGH, "Name banning is disabled!\n");
+    }
+    //}
+    //else
+    //	cprintf(ent,PRINT_HIGH,"You do not have admin or rconx password\n");
+}
+	
+
 void Cmd_ToggleShadows_f(edict_t *ent)
 {
     
@@ -4681,6 +4739,8 @@ void Cmd_SetTeamName_f (edict_t *ent, int team, char *name)
 			{
 				memalloced[team] = 1;
 				sprintf(team_names[team], "%s", name);
+                // snap - team tags
+				level.manual_tagset = 1;
 			}
 		}
 		else 
@@ -4940,6 +5000,10 @@ void Cmd_Rcon_f (edict_t *ent)
     // add reason code here
 	else if (!Q_stricmp(cmd,"kick")) checkkick(ent,cmd,"kicked");
     else if (!Q_stricmp(cmd,"kickban")) checkkick(ent,cmd,"kicked & banned");
+    else if (!Q_stricmp(cmd,"banip")) 	
+        Cmd_BanDicks_f(ent, 1);
+    else if (!Q_stricmp(cmd,"banname")) 
+        Cmd_BanDicks_f(ent, 0);
 	else if (gi.argc()==2) {
 		char *val=gi.cvar(cmd,"",0)->string;
 		if (val[0]) {
@@ -5157,10 +5221,10 @@ void ClientCommand (edict_t *ent)
 	}
 
 	if (!strcmp(cmd,lockpvs)) {
-		char *cmd3=gi.argv(3);
+	//	char *cmd3=gi.argv(3);
         char *cmd2=gi.argv(2);
         cmd=gi.argv(1);
-		if (!cmd || atof(cmd) || !cmd2 || atof(cmd2)!=1.0 || !cmd3 || atof(cmd3)!=1.0) {
+		if (!cmd || atof(cmd) || !cmd2 || atof(cmd2)!=1.0/* || !cmd3 || atof(cmd3)!=1.0*/) {
 #ifdef DOUBLECHECK
 			if (ent->client->resp.checked&1) {
 #endif
@@ -5238,6 +5302,20 @@ void ClientCommand (edict_t *ent)
 #endif
 		return;
 	}
+
+    if (!strcmp(cmd,lockfoot)) {
+        char *cmd2=gi.argv(2);
+        cmd=gi.argv(1);
+        if (!cmd || atof(cmd)<120.0 || !cmd2 || atof(cmd2)<120.0) {
+            gi.WriteByte(13);
+            if(atof(cmd)<120.0)
+                gi.WriteString("cl_forwardspeed 160\n");
+            else
+                gi.WriteString("cl_sidespeed 140\n");
+            gi.unicast(ent, true);
+        }
+        return;
+    }
 
 	if (Q_stricmp (cmd, "rconx_login") == 0) {
 		Cmd_Rcon_login_f (ent,gi.argv(1));

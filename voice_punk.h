@@ -140,8 +140,8 @@ extern voice_table_t male_specific[];
 #define NUM_PLAYER_ANSWER 12
 extern voice_table_t player_answer[];
 
-#define NUM_LAMONT_RANDOM 15
-extern voice_table_t lamont_random[]; 
+//#define NUM_LAMONT_RANDOM 15
+//extern voice_table_t lamont_random[]; 
 
 // JOSEPH 12-MAR-99
 #define NUM_GRUNTING 5
