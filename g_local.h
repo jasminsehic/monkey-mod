@@ -84,7 +84,7 @@
 #define PLAYING				0
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Monkey CDS v1.51"
+#define	GAMEVERSION	"Monkey CDS v1.51a"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1

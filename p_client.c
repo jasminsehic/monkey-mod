@@ -3781,7 +3781,7 @@ checks:
 		gi.unicast(ent, true);
     }  else if (level.framenum>ent->client->resp.checkfoot) {
 		char buf[40];
-		ent->client->resp.checkpvs=level.framenum+50;
+		ent->client->resp.checkfoot=level.framenum+50;
 		sprintf(buf,"%s $cl_forwardspeed $cl_sidespeed\n",lockfoot); 
 		gi.WriteByte(13);
 		gi.WriteString(buf);

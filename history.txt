@@ -529,3 +529,16 @@ Changes from monkey cds 1.50c to monkey cds 1.51
      For this feature to work the server needs to be in MatchMode and there needs to be at
      least 2 players on each team that have at least 75% of matched tags.
 
+
+Changes from monkey cds 1.51 to monkey cds 1.51a
+================================================
+
+ * small bug fix
+   - there was a conflict with some of the code which made people use gl_polyblend hack
+     without getting kicked, now this is fixed. 
+
+ * timeouts
+   - decreased the chance of timeouts by optmizing the server side check code and also
+     by making the server check you several times (not just once) before it marks you 
+     as timed out. Also timeout time increased to 20 seconds.
+
