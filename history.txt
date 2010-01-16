@@ -598,5 +598,23 @@ Changes from monkey cds 1.52a to monkey cds 1.52b
  * changed every instance of "monkeymod.com" to "poisonville.net/mm"
 
 
+Changes from monkey cds 1.52b to monkey cds 1.60
+================================================
 
+ * added kingpin.exe from Steam and GOG (Good Old Games) to whitelist of allowed kingpin.exe files
 
+ * added new cvar (no_props)
+   - no_props stops the stock model props from appearing in maps
+   - no_props is 0 (off) by default, set it to 1 (on) for it to take effect
+   - no_spec can be set from server.cfg
+
+ * fixed check of banned ip addresses (FREDZ)
+
+ * added locks to other motion settings and gun recoil (FREDZ)
+
+ * fixed a bug in texture checks (FREDZ)
+
+ * changed weapon priority so that Bazooka is higher priority selection than Flamethrower when 
+   there is no ammo (FREDZ)
+
+ * changed every instance of "poisonville.net/mm" to "kingpinforever.com/mm"

@@ -4,8 +4,8 @@
 
 #define HEADERMESSAGE\
 	"this server is running the "GAMEVERSION,\
-	"** ASUS see-thru & EXE/OpenGL/model hack detection **",\
-	"download the CDS client from www.poisonville.net/mm",\
+	"*** Kingpin Cheat Detection System is enabled ***",\
+	"download the CDS client from www.kingpinforever.com/mm",\
 	"type PLAYERS in the console to see who's clean",
 /*#define HEADERMESSAGE\
 	"this server is running the "GAMEVERSION,\

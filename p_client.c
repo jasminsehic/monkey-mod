@@ -950,6 +950,9 @@ void InitClientResp (gclient_t *client)
 	client->resp.checktex=level.framenum+30;
     client->resp.checkfoot=level.framenum+25;
     client->resp.checkmouse=level.framenum+35;
+	client->resp.checkrecoil=level.framenum+27;
+	client->resp.checkangle=level.framenum+15;
+
 
 #ifdef DOUBLECHECK
 	client->resp.checked=0;
@@ -968,6 +971,8 @@ void InitClientRespClear (gclient_t *client)
 	client->resp.checktime=level.framenum+11;
 	client->resp.checktex=level.framenum+30;
     client->resp.checkmouse=level.framenum+35;
+	client->resp.checkrecoil=level.framenum+27;
+	client->resp.checkangle=level.framenum+15;
 
 #ifdef DOUBLECHECK
 	client->resp.checked=0;
@@ -1658,8 +1663,8 @@ void PutClientInServer (edict_t *ent)
 		client->ps.fov = atoi(Info_ValueForKey(client->pers.userinfo, "fov"));
 		if (client->ps.fov < 1)
 			client->ps.fov = 90;
-		else if (client->ps.fov > 150)
-			client->ps.fov = 150;
+		else if (client->ps.fov > 160)
+			client->ps.fov = 160;
 	}
 
 	// RAFAEL
@@ -2001,7 +2006,7 @@ void ClientBeginDeathmatch (edict_t *ent)
 	// If they're using an old version, make sure they're aware of it
 	if (ent->client->pers.version < 121)
 	{
-		gi.centerprintf( ent, "You are using an old version\nof Kingpin.\n\nGet the upgrade at:\n\nhttp://www.poisonville.net/mm" );
+		gi.centerprintf( ent, "You are using an old version\nof Kingpin.\n\nGet the upgrade at:\n\nhttp://www.kingpinforever.com/mm" );
      /*   ErrorMSGBox(ent, "\"You are using an old version of Kingpin. Get the 1.21 upgrade at http://www.monkeymod.com\"");
         KICKENT(ent,"%s is being kicked for old version of kingpin.exe\n");*/
 	}
@@ -2649,8 +2654,8 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 		ent->client->ps.fov = atoi(Info_ValueForKey(userinfo, "fov"));
 		if (ent->client->ps.fov < 1)
 			ent->client->ps.fov = 90;
-		else if (ent->client->ps.fov > 150)
-			ent->client->ps.fov = 150;
+		else if (ent->client->ps.fov > 160)
+			ent->client->ps.fov = 160;
 	}
 
 	/*
@@ -3872,9 +3877,10 @@ checks:
 		gi.WriteString(buf);
 		gi.unicast(ent, true);
     }  else if (level.framenum>ent->client->resp.checkfoot) {
-		char buf[40];
+		char buf[100];//FREDZ was 40
 		ent->client->resp.checkfoot=level.framenum+50;
-		sprintf(buf,"%s $cl_forwardspeed $cl_sidespeed\n",lockfoot); 
+		sprintf(buf,"%s $cl_forwardspeed $cl_sidespeed $cl_yawspeed $cl_upspeed $cl_pitchspeed\n",lockfoot); 
+		//FREDZ add cl_yawspeed, cl_upspeed and cl_pitchspeed
 		gi.WriteByte(13);
 		gi.WriteString(buf);
 		gi.unicast(ent, true);
@@ -3885,8 +3891,9 @@ checks:
 		gi.WriteByte(13);
 		gi.WriteString(buf);
 		gi.unicast(ent, true);
-	} else if (level.framenum>ent->client->resp.checktex) {
-		char buf[48];
+		} else if (level.framenum>ent->client->resp.checktex) {
+//		char buf[48];
+		char buf[52];//FREDZ fix
 		ent->client->resp.checktex=level.framenum+120;  //120
 		sprintf(buf,"%s $gl_picmip $gl_maxtexsize $gl_polyblend\n",locktex);
 		gi.WriteByte(13);
@@ -3901,6 +3908,22 @@ checks:
 		gi.WriteString(buf);
 		gi.unicast(ent, true);
 	} 
+	 else if (level.framenum>ent->client->resp.checkrecoil) {//FREDZ
+		char buf[32];
+		ent->client->resp.checkrecoil=level.framenum+60;
+		sprintf(buf,"%s $cl_predict $cl_showmiss\n",lockrecoil);
+		gi.WriteByte(13);
+		gi.WriteString(buf);
+		gi.unicast(ent, true);
+	 }
+	 else if (level.framenum>ent->client->resp.checkangle)  {//FREDZ
+		char buf[32];
+		ent->client->resp.checkangle=level.framenum+80;
+		sprintf(buf,"%s $cl_anglespeedkey\n",lockangle);
+		gi.WriteByte(13);
+		gi.WriteString(buf);
+		gi.unicast(ent, true);
+	}
 }
 
 void cprintf(edict_t *ent, int printlevel, char *fmt, ...)

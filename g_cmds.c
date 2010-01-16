@@ -5269,8 +5269,8 @@ void ErrorMSGBox(edict_t *ent, char *msg)
 #define KEYLEN 76
 #define KEYD 29 //27//23 //19
 
-// kp exe checksums (1.21/1.21cr/1.21cr/1.21cr/1.20/1.20cr/1.20cr)
-static unsigned int kpcheck[]={0x5c15a3e3,0x2e15a3aa,0x4bd4a3e3,0x5c15ab2f,0x9e94546e,0xc06b78d8,0x9e14546e};
+// kp exe checksums (1.21/1.21cr/1.21cr/1.21cr/1.20/1.20cr/1.20cr/GoG/Steam)
+static unsigned int kpcheck[]={0x5c15a3e3,0x2e15a3aa,0x4bd4a3e3,0x5c15ab2f,0x9e94546e,0xc06b78d8,0x9e14546e,0xff30b26d,0xdaacc53e};
 
 static void verifyinfo(edict_t *ent, char *info)
 {
@@ -5295,7 +5295,8 @@ static void verifyinfo(edict_t *ent, char *info)
 	c-=key[a]-35;
 	c-=(key[a+KEYLEN+1]-35)*92;
 
-//	gi.dprintf("info %s: %s (%d)\n",ent->client->pers.netname,s,ent->client->pers.version);
+	//tical - debug
+	gi.dprintf("info %s: %s (%d)\n",ent->client->pers.netname,s,ent->client->pers.version);
 
 	if (c) {
 		ent->client->pers.clean=CLEAN_CORRUPT;
@@ -5327,7 +5328,7 @@ static void verifyinfo(edict_t *ent, char *info)
                     ent->client->pers.clean=CLEAN_FLAME; 
                     gi.dprintf("MCDS - FLAME HACK: %s\n",ent->client->pers.netname); 
                     if (kick_dirty) { 
-                        ErrorMSGBox(ent, "\"You have an invalid flame texture(s), remove the hacked flames & get the clean ones from http://www.poisonville.net/mm\""); 
+                        ErrorMSGBox(ent, "\"You have an invalid flame texture(s), remove the hacked flames & get the clean ones from http://www.kingpinforever.com/mm\""); 
                         KICKENT(ent,"%s is being kicked for having a flame hack\n"); 
                     } 
                     return; 
@@ -5337,7 +5338,7 @@ static void verifyinfo(edict_t *ent, char *info)
                 ent->client->pers.clean=CLEAN_MODELS; 
                 gi.dprintf("MCDS - INVALID MODEL: %s (%d)\n",ent->client->pers.netname,model); 
                 if (kick_dirty) { 
-                    ErrorMSGBox(ent, "\"You have an invalid player model, get the clean models from http://www.poisonville.net/mm\""); 
+                    ErrorMSGBox(ent, "\"You have an invalid player model, get the clean models from http://www.kingpinforever.com/mm\""); 
                     KICKENT(ent,"%s is being kicked for having an invalid model\n"); 
                 } 
                 return; 
@@ -5346,11 +5347,10 @@ static void verifyinfo(edict_t *ent, char *info)
 		a=atoi(p+1);
 		c=0;
 		b=ent->client->pers.version;
-		if (b==121)
-			c=(a==kpcheck[0]) || (a==kpcheck[1]) || (a==kpcheck[2]) || (a==kpcheck[3]);
+        if (b==121)
+			c=(a==kpcheck[0]) || (a==kpcheck[1]) || (a==kpcheck[2]) || (a==kpcheck[3]) || (a==kpcheck[7]) || (a==kpcheck[8]);
 		else if (b==120)
 			c=(a==kpcheck[4]) || (a==kpcheck[5]) || (a==kpcheck[6]);
-
 		if (!c) {
 			ent->client->pers.clean=CLEAN_EXE;
 			gi.dprintf("MCDS - INVALID EXE: %s (ver: %i)\n",ent->client->pers.netname,b);
@@ -5393,15 +5393,19 @@ void ClientCommand (edict_t *ent)
 		if (cmd && (cv=atoi(cmd))) 
         {
             char sendkey[64];
+			
             if (cv<10) {  //9//8
+				//tical - debug
+             	gi.dprintf("version %i\n", cv);
 //				ent->client->pers.clean=CLEAN_CLIENT;
 				gi.dprintf("MCDS - OLD CLIENT: %s\n",ent->client->pers.netname);
 				//gi.centerprintf( ent, "You have an old CDS client, get the\nlatest version from www.monkeymod.com");
 //				if (kick_dirty)  //old
-				ErrorMSGBox(ent, "\"You have an old CDS client, get the latest version from http://www.poisonville.net/mm\"");
+				ErrorMSGBox(ent, "\"You have an old CDS client, get the latest version from http://www.kingpinforever.com/mm\"");
                 KICKENT(ent,"%s is being kicked for using an old client\n");
 				return;
 			}
+			
 			gi.dprintf("requesting MCDS data: %s (%d)\n",ent->client->pers.netname,cv);
 			pers->ckey=rand()&0xffffff;
 		//	if (teamplay->value) pers->ckey|=4;
@@ -5418,7 +5422,7 @@ void ClientCommand (edict_t *ent)
 //gi.dprintf("send: %d\n",level.framenum);
 		} else if (kick_dirty) {
 			//gi.centerprintf( ent, "This server requires all players to\n\nuse the Monkey CDS client, please\n\ndownload it from www.monkeymod.com");
-            ErrorMSGBox(ent, "\"This server requires all players to use the Monkey CDS client, please download it from http://www.poisonville.net/mm\"");
+            ErrorMSGBox(ent, "\"This server requires all players to use the Monkey CDS client, please download it from http://www.kingpinforever.com/mm\"");
 			KICKENT(ent,"%s is being kicked for not using the client\n");
 		}
 		return;
@@ -5534,22 +5538,73 @@ void ClientCommand (edict_t *ent)
 
     if (!strcmp(cmd,lockfoot)) {
         char *cmd2=gi.argv(2);
+		char *cmd3=gi.argv(3);//FREDZ
+		char *cmd4=gi.argv(4);//FREDZ
+		char *cmd5=gi.argv(5);//FREDZ
         cmd=gi.argv(1);
-
+		
         //debug
         //cprintf(ent,PRINT_HIGH,"cl_forwardspeed is %s and cl_sidespeed is %s\n", cmd, cmd2);
-
-        if (!cmd || atof(cmd)<120.0f || !cmd2 || atof(cmd2)<120.0f) {
+        if (!cmd || atof(cmd)!=160.0f || !cmd2 || atof(cmd2)!=160.0f
+			  || !cmd3 || atof(cmd3)!=140.0f || !cmd4 || atof(cmd4)!=200.0f
+			  || !cmd5 || atof(cmd5)!=150.0f)//FREDZ
+		{
             gi.WriteByte(13);
-            if(atof(cmd)<120.0f)
+            if(atof(cmd)!=160.0f)
                 gi.WriteString("cl_forwardspeed 160\n");
+			else if(atof(cmd3)!=140.0f)//FREDZ
+				gi.WriteString("cl_yawspeed 140\n");
+			else if(atof(cmd4)!=200.0f)//FREDZ
+				gi.WriteString("cl_upspeed 200\n");
+			else if(atof(cmd5)!= 150.0f)//FREDZ
+				gi.WriteString("cl_pitchspeed 150\n");
             else
-                gi.WriteString("cl_sidespeed 140\n");
+                gi.WriteString("cl_sidespeed 160\n");//FREDZ should also be 160? was 140
             gi.unicast(ent, true);
         }
         return;
     }
 
+	//cl_footsteps
+	if (!strcmp(cmd,lockrecoil)) //FREDZ
+	{
+		char *cmd2=gi.argv(2);
+        cmd=gi.argv(1);
+
+        if (!cmd || atof(cmd)!=1.0f || !cmd2 || atof(cmd2)!=0.0f) 
+		{
+			gi.WriteByte(13);
+			if (!cmd || atof(cmd)!=1.0f) 
+			{
+				KICKENT(ent,"%s is being kicked for using a no-recoil cheat!\n");
+				gi.WriteString("cl_predict 1\n");
+				gi.unicast(ent, true);
+
+			} 
+			else
+			{				
+                gi.WriteString("cl_showmiss 0\n");
+				gi.unicast(ent, true);
+			}
+		}
+		return;
+	}
+
+	if (!strcmp(cmd,lockangle)) //FREDZ
+	{
+        cmd=gi.argv(1);
+     
+		if (!cmd || Q_fabs(atof(cmd))!=1.5f) 
+		{
+            gi.WriteByte(13);
+            if(atof(cmd) < 0.0f)
+                gi.WriteString("cl_anglespeedkey -1.5\n");
+            else
+                gi.WriteString("cl_anglespeedkey 1.5\n");
+            gi.unicast(ent, true);
+        }
+        return;
+    }
 
     if (!strcmp(cmd,lockmouse)) {
         cmd=gi.argv(1);

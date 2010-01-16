@@ -600,25 +600,18 @@ int	CheckNameBan (char *name)
 
 int	CheckPlayerBan (char *userinfo)
 {
-	char	*value, *test;
-	int		i;
-    char    temp[22];
+	char	*value;
+	int		i,j;
+	int		isSame;
 
 	value = Info_ValueForKey (userinfo, "name");
 	if (CheckNameBan(value))
 		return true;
 
     value = Info_ValueForKey (userinfo, "ip");
-	
-    strcpy(temp, value);
-    test = strrchr(temp,':');
-    test[0]='\0';
 
-    for (i=0;i<num_ips;i++)
-		if (strstr(temp, ip[i].value))
-				return true;
     
-/*    for (i=0;i<num_ips;i++) {
+    for (i=0;i<num_ips;i++) {
 		isSame = true;
 		j = 0;
 		while ((isSame) && (value[j] != '\0') && (value[j] != ':'))
@@ -629,8 +622,8 @@ int	CheckPlayerBan (char *userinfo)
 		}
 		if (isSame)
 			return true;
-	}*/
-
+	}
+	
 	return false;
 }
 

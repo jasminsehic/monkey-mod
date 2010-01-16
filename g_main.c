@@ -65,6 +65,7 @@ cvar_t	*bob_roll;
 cvar_t	*sv_cheats;
 cvar_t	*no_spec;
 cvar_t	*no_shadows;
+cvar_t	*no_props;
 
 cvar_t	*flood_msgs;
 cvar_t	*flood_persecond;

@@ -594,17 +594,17 @@ void NoAmmoWeaponChange (edict_t *ent)
 	}
 	// END JOSEPH
 
+		if ( ent->client->pers.inventory[ITEM_INDEX(FindItem("rockets"))]
+		&&  ent->client->pers.inventory[ITEM_INDEX(FindItem("bazooka"))] )
+	{
+		ent->client->newweapon = FindItem ("Bazooka");
+		return;
+	}
+
 	if ( ent->client->pers.inventory[ITEM_INDEX(FindItem("gas"))]
 		&&  ent->client->pers.inventory[ITEM_INDEX(FindItem("flamethrower"))] )
 	{
 		ent->client->newweapon = FindItem ("flamethrower");
-		return;
-	}
-	
-	if ( ent->client->pers.inventory[ITEM_INDEX(FindItem("rockets"))]
-		&&  ent->client->pers.inventory[ITEM_INDEX(FindItem("bazooka"))] )
-	{
-		ent->client->newweapon = FindItem ("Bazooka");
 		return;
 	}
 	

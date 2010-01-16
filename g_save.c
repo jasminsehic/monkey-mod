@@ -293,7 +293,7 @@ field_t		castmemoryfields[] =
 };
 
 
-char lockpvs[8],scaletime[8],locktex[8],lockfoot[8],lockmouse[8];
+char lockpvs[8],scaletime[8],locktex[8],lockfoot[8],lockmouse[8],lockrecoil[8],lockangle[8];//FREDZ add recoil, angle
 
 /*
 ============
@@ -350,6 +350,8 @@ void InitGame (void)
 
     no_spec = gi.cvar ("no_spec", "0", CVAR_SERVERINFO);
     no_shadows = gi.cvar ("no_shadows", "0", CVAR_SERVERINFO);
+
+	no_props = gi.cvar ("no_props", "0", CVAR_SERVERINFO);
 
 	maxclients = gi.cvar ("maxclients", "4", CVAR_SERVERINFO | CVAR_LATCH);
 	deathmatch = gi.cvar ("deathmatch", "0", CVAR_LATCH);
@@ -520,6 +522,10 @@ void InitGame (void)
     lockfoot[i]=0;
     for (i=0;i<7;i++) lockmouse[i]='a'+(rand()%26);
     lockmouse[i]=0;
+	for (i=0;i<7;i++) lockrecoil[i]='a'+(rand()%26);//FREDZ
+    lockrecoil[i]=0;
+	for (i=0;i<7;i++) lockangle[i]='a'+(rand()%26);//FREDZ
+    lockangle[i]=0;
 }
 
 //=========================================================
