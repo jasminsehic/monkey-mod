@@ -11,16 +11,6 @@ else {gi.cvar_set(a,value);cprintf(ent,PRINT_HIGH,"This setting will take effect
 extern int team_startcash[2];
 extern int memalloced[3];
 
-#define CLEAN_CLEAN		1
-#define CLEAN_ASUS		2
-#define CLEAN_EXE		3
-//#define CLEAN_CLIENT	4
-#define CLEAN_CORRUPT	5
-#define CLEAN_OPENGL	6
-#define CLEAN_MODELS	7
-#define CLEAN_TIMED		8
-#define CLEAN_FLAME     9
-
 //tical - define taunts
 #define KINGPIN		1
 #define LEROY		2
@@ -3652,40 +3642,10 @@ void Cmd_Players_f (edict_t *ent)
 
 	for (i = 0 ; i < count ; i++)
 	{
-		Com_sprintf (small, sizeof(small), "%2i - %s (%i frags)",
+		Com_sprintf (small, sizeof(small), "%2i - %s (%i frags)\n",
 			index[i] + 1,
 			game.clients[index[i]].pers.netname,
 			game.clients[index[i]].ps.stats[STAT_FRAGS]);
-		switch (game.clients[index[i]].pers.clean) {
-			case CLEAN_CLEAN:
-				strcat(small," ** clean");
-				break;
-			case CLEAN_ASUS:
-				strcat(small," ** ASUS drivers");
-				break;
-			case CLEAN_EXE:
-				strcat(small," ** invalid EXE");
-				break;
-/*			case CLEAN_CLIENT:
-				strcat(small," ** old client");
-				break;*/
-			case CLEAN_CORRUPT:
-				strcat(small," ** corrupt info");
-				break;
-			case CLEAN_OPENGL:
-				strcat(small," ** hacked OPENGL");
-				break;
-			case CLEAN_MODELS:
-				strcat(small," ** invalid model");
-				break;
-			case CLEAN_FLAME:
-				strcat(small," ** flame hack");
-				break;
-			case CLEAN_TIMED:
-				strcat(small," ** timedout");
-				break;
-		}
-		strcat(small,"\n");
 		if (strlen (small) + strlen(large) > sizeof(large) - 100 )
 		{	// can't print all of them in one packet
 			strcat (large, "...\n");
@@ -4049,7 +4009,6 @@ void Cmd_PrintSettings_f (edict_t *ent)
 	cprintf(ent, PRINT_HIGH,"dm_realmode     : %d\n", (int)dm_realmode->value);
 	cprintf(ent, PRINT_HIGH,"Server password : %s\n", password->string);
 	cprintf(ent, PRINT_HIGH,"Teamplay mode   : %d\n",(int)teamplay->value);
-    cprintf(ent, PRINT_HIGH,"Cheat Dectection: %s\n", kick_dirty?"on":"off");
 	if (admincode[0] || !disable_admin_voting) {
 		int			i,found;
 		edict_t		*player;
@@ -4108,7 +4067,7 @@ void Cmd_CommandList_f (edict_t *ent)
 	cprintf(ent, PRINT_HIGH,"resign, commands, settings, toggle_shadows\n");
 	if (teamplay->value) {
 		cprintf(ent, PRINT_HIGH,"matchsetup, matchscore, matchstart, matchend, clientlist\n");
-		cprintf(ent, PRINT_HIGH,"publicsetup, resetserver, changemap, maplist, mute, cds\n");
+		cprintf(ent, PRINT_HIGH,"publicsetup, resetserver, changemap, maplist, mute\n");
 	} else
 		cprintf(ent, PRINT_HIGH,"resetserver, changemap, maplist, clientlist, mute, cds\n");
 	cprintf(ent, PRINT_HIGH,"settimelimit, setfraglimit, setcashlimit, setidletime\n");
@@ -4475,50 +4434,6 @@ void Cmd_SetFragLimit_f (edict_t *ent, char *value)
 			gi.bprintf(PRINT_HIGH,"The Fraglimit has been changed to %d.\n",i);
 			gi.cvar_set("fraglimit",value);
 		}
-	else
-		cprintf(ent,PRINT_HIGH,"You do not have admin\n");
-}
-
-void Cmd_Enable_CDS_f (edict_t *ent)
-{
-	
-   if (!gi.argv(1) || !*gi.argv(1)) 
-   {
-		cprintf(ent,PRINT_HIGH,"USAGE: cds <on/off>\nNOTE: You don't need to use arrow brackets!\n");
-        return;
-   }
-
-    if (ent->client->pers.admin == ADMIN )
-    {
-        char command [256];
-
-        if (Q_stricmp (gi.argv(1), "on") == 0)
-        {   
-            if(kick_dirty)
-            {
-                cprintf(ent,PRINT_HIGH,"CDS already enabled!\n");
-                return;
-            }
-            kick_dirty = true;
-            gi.cvar_set("CDS client","required");
-            Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.mapname);
-	        gi.AddCommandString (command);
-        }
-        else if (Q_stricmp (gi.argv(1), "off") == 0)
-        {
-            if(!kick_dirty)
-            {
-                cprintf(ent,PRINT_HIGH,"CDS already disabled!\n");
-                return;
-            }
-            kick_dirty = false;
-            gi.cvar_set("CDS client","optional");
-            Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.mapname);
-	        gi.AddCommandString (command);
-        }
-        else
-            cprintf(ent,PRINT_HIGH,"USAGE: cds <on/off>\nNOTE: You don't need to use arrow brackets!\n");
-    }
 	else
 		cprintf(ent,PRINT_HIGH,"You do not have admin\n");
 }
@@ -5149,41 +5064,6 @@ void Cmd_Rcon_f (edict_t *ent)
 		return;
 	}
 	else if (!Q_stricmp(cmd,"nopassword")) gi.cvar_set("password","");
-    else if (!Q_stricmp(cmd,"cds"))
-    {
-        if (!gi.argv(2) || !*gi.argv(2)) 
-        {
-            cprintf(ent,PRINT_HIGH,"USAGE: cds <on/off>\nNOTE: You don't need to use arrow brackets!\n");
-            return;
-        }        
-        if (Q_stricmp (gi.argv(2), "on") == 0)
-        {   
-            if(kick_dirty)
-            {
-                cprintf(ent,PRINT_HIGH,"CDS already enabled!\n");
-                return;
-            }
-            kick_dirty = true;
-            gi.cvar_set("CDS client","required");
-            Com_sprintf (cmdline, sizeof(cmdline), "gamemap \"%s\"\n", level.mapname);
-        }
-        else if (Q_stricmp (gi.argv(2), "off") == 0)
-        {
-            if(!kick_dirty)
-            {
-                cprintf(ent,PRINT_HIGH,"CDS already disabled!\n");
-                return;
-            }
-            kick_dirty = false;
-            gi.cvar_set("CDS client","optional");
-            Com_sprintf (cmdline, sizeof(cmdline), "gamemap \"%s\"\n", level.mapname);
-        }
-        else
-        {
-            cprintf(ent,PRINT_HIGH,"USAGE: cds <on/off>\nNOTE: You don't need to use arrow brackets!\n");
-            return;
-        }
-    }
     // add reason code here
 	else if (!Q_stricmp(cmd,"kick")) 
     {
@@ -5266,105 +5146,6 @@ void ErrorMSGBox(edict_t *ent, char *msg)
     gi.unicast(ent, true);
 }
 
-#define KEYLEN 76
-#define KEYD 29 //27//23 //19
-
-// kp exe checksums (1.21/1.21cr/1.21cr/1.21cr/1.20/1.20cr/1.20cr/GoG/Steam)
-static unsigned int kpcheck[]={0x5c15a3e3,0x2e15a3aa,0x4bd4a3e3,0x5c15ab2f,0x9e94546e,0xc06b78d8,0x9e14546e,0xff30b26d,0xdaacc53e};
-
-static void verifyinfo(edict_t *ent, char *info)
-{
-	int a,b,c,k;
-	char s[KEYLEN+3],key[KEYLEN+3];
-
-//	gi.dprintf("info %d %s\n",ent->client->pers.ckey,info);
-
-	memcpy(key,info,KEYLEN+3);
-	for (a=KEYLEN+1;a;a--)
-		key[a]=((key[a]+114-key[a-1])%92)+35;
-
-	s[KEYLEN]=0;
-	for (a=KEYLEN,c=(ent->client->pers.ckey+KEYD)&0xffffff;a;a--) {
-		k=key[1+((a*17)%KEYLEN)];
-		b=(k+0x7f00002c-35-(a*c))%92;
-		c+=k*k;
-		if (b) b+=31;
-		s[a-1]=b;
-		c%=8464;
-	}
-	c-=key[a]-35;
-	c-=(key[a+KEYLEN+1]-35)*92;
-
-	//tical - debug
-	gi.dprintf("info %s: %s (%d)\n",ent->client->pers.netname,s,ent->client->pers.version);
-
-	if (c) {
-		ent->client->pers.clean=CLEAN_CORRUPT;
-		gi.dprintf("MCDS - CORRUPT INFO: %s\n",ent->client->pers.netname);
-		if (kick_dirty) {
-			KICKENT(ent,"%s is being kicked for having corrupt client info\n");
-		}
-	} else if (s[0]!='*') {
-		ent->client->pers.clean=CLEAN_ASUS;
-		gi.dprintf("MCDS - ASUS DRIVERS: %s\n",ent->client->pers.netname);
-		if (kick_dirty) {
-			KICKENT(ent,"%s is being kicked for having Asus drivers\n");
-		}
-	} else {
-		char *p=s+1;
-		if (*p!='*') {
-			ent->client->pers.clean=CLEAN_OPENGL;
-			gi.dprintf("MCDS - HACKED OPENGL: %s\n",ent->client->pers.netname);
-			if (kick_dirty) {
-				KICKENT(ent,"%s is being kicked for having an opengl hack\n");
-			}
-			return;
-		}
-		p++;
-        if (*p!='*') { 
-            int model=atoi(p); 
-            if (model==51 || model==52) { 
-                if (kick_flamehack->value) { 
-                    ent->client->pers.clean=CLEAN_FLAME; 
-                    gi.dprintf("MCDS - FLAME HACK: %s\n",ent->client->pers.netname); 
-                    if (kick_dirty) { 
-                        ErrorMSGBox(ent, "\"You have an invalid flame texture(s), remove the hacked flames & get the clean ones from http://www.kingpinforever.com/mm\""); 
-                        KICKENT(ent,"%s is being kicked for having a flame hack\n"); 
-                    } 
-                    return; 
-                } 
-                p+=2; 
-            } else { 
-                ent->client->pers.clean=CLEAN_MODELS; 
-                gi.dprintf("MCDS - INVALID MODEL: %s (%d)\n",ent->client->pers.netname,model); 
-                if (kick_dirty) { 
-                    ErrorMSGBox(ent, "\"You have an invalid player model, get the clean models from http://www.kingpinforever.com/mm\""); 
-                    KICKENT(ent,"%s is being kicked for having an invalid model\n"); 
-                } 
-                return; 
-            } 
-        } 
-		a=atoi(p+1);
-		c=0;
-		b=ent->client->pers.version;
-        if (b==121)
-			c=(a==kpcheck[0]) || (a==kpcheck[1]) || (a==kpcheck[2]) || (a==kpcheck[3]) || (a==kpcheck[7]) || (a==kpcheck[8]);
-		else if (b==120)
-			c=(a==kpcheck[4]) || (a==kpcheck[5]) || (a==kpcheck[6]);
-		if (!c) {
-			ent->client->pers.clean=CLEAN_EXE;
-			gi.dprintf("MCDS - INVALID EXE: %s (ver: %i)\n",ent->client->pers.netname,b);
-			if (kick_dirty) {
-				KICKENT(ent,"%s is being kicked for having an invalid EXE\n")
-			}
-		} else {
-			ent->client->pers.clean=CLEAN_CLEAN;
-			gi.dprintf("MCDS - CLEAN: %s\n",ent->client->pers.netname);
-		}
-	}
-}
-
-
 
 /*
 =================
@@ -5375,7 +5156,6 @@ ClientCommand
 void ClientCommand (edict_t *ent)
 {
 	char	*cmd;
-	client_persistant_t *pers;
 
 	if (!ent->client)
 		return;		// not fully in game yet
@@ -5383,61 +5163,7 @@ void ClientCommand (edict_t *ent)
 	if (!ent->inuse)
 		return;
 
-	pers=&(ent->client->pers);
 	cmd = gi.argv(0);
-
-   	if (!strcmp(cmd,"mmod_check")) {
-		int cv;
-        if (pers->clean) return;  
-		cmd=gi.argv(1);
-		if (cmd && (cv=atoi(cmd))) 
-        {
-            char sendkey[64];
-			
-            if (cv<10) {  //9//8
-				//tical - debug
-             	gi.dprintf("version %i\n", cv);
-//				ent->client->pers.clean=CLEAN_CLIENT;
-				gi.dprintf("MCDS - OLD CLIENT: %s\n",ent->client->pers.netname);
-				//gi.centerprintf( ent, "You have an old CDS client, get the\nlatest version from www.monkeymod.com");
-//				if (kick_dirty)  //old
-				ErrorMSGBox(ent, "\"You have an old CDS client, get the latest version from http://www.kingpinforever.com/mm\"");
-                KICKENT(ent,"%s is being kicked for using an old client\n");
-				return;
-			}
-			
-			gi.dprintf("requesting MCDS data: %s (%d)\n",ent->client->pers.netname,cv);
-			pers->ckey=rand()&0xffffff;
-		//	if (teamplay->value) pers->ckey|=4;
-		//	else pers->ckey&=~4;
-
-            sprintf(sendkey, "clear\necho \"mm_ckey:%d\"\ncondump m9\nclear\n", pers->ckey);
-
-		//	gi.cprintf(ent,PRINT_HIGH,"mm_ckey:%d\n",pers->ckey);
-			gi.WriteByte(13);
-		//	gi.WriteString("condump m8\nclear\n"); //8//7 //6
-            gi.WriteString(sendkey);
-			gi.unicast(ent, true);
-			ent->client->pers.checkmmod=level.framenum+40;   // exec mmdata.cfg in 4 seconds
-//gi.dprintf("send: %d\n",level.framenum);
-		} else if (kick_dirty) {
-			//gi.centerprintf( ent, "This server requires all players to\n\nuse the Monkey CDS client, please\n\ndownload it from www.monkeymod.com");
-            ErrorMSGBox(ent, "\"This server requires all players to use the Monkey CDS client, please download it from http://www.kingpinforever.com/mm\"");
-			KICKENT(ent,"%s is being kicked for not using the client\n");
-		}
-		return;
-	}
-	if (!strcmp(cmd, "mmod_info")) {
-		if (!pers->clean) {
-//gi.dprintf("response: %d\n",level.framenum);
-			ent->client->pers.mmodkick=ent->client->pers.checkmmod=0;
-			gi.WriteByte(13);
-			gi.WriteString("condump m0\nclear\n");
-			gi.unicast(ent, true);
-			verifyinfo(ent,gi.argv(1));
-		}
-		return;
-	}
 
 	if (!strcmp(cmd,lockpvs)) {
 	//	char *cmd3=gi.argv(3);
@@ -5952,8 +5678,6 @@ void ClientCommand (edict_t *ent)
 		Cmd_Key_f (ent,0);
 	else if (strstr (cmd, "taunt") == cmd)
 		Cmd_Key_f (ent,0);
-    else if (Q_stricmp (cmd, "cds") == 0) 
-        Cmd_Enable_CDS_f(ent);
     else if (Q_stricmp (cmd, "toggle_asc") == 0) 
         Cmd_Toggle_ASC_f(ent);
     else if (Q_stricmp (cmd, "toggle_spec") == 0) 

@@ -251,46 +251,6 @@ void SVCmd_WriteIP_f (void)
 	fclose (f);
 }
 
-void SVCmd_Enable_CDS_f (void)
-{
-	
-    char command [256];
-    
-    if (!gi.argv(2) || !*gi.argv(2)) 
-    {
-        gi.cprintf(NULL,PRINT_HIGH,"USAGE: cds <on/off>\nNOTE: You don't need to use arrow brackets!\n");
-        return;
-    }    
-    
-    if (Q_stricmp (gi.argv(2), "on") == 0)
-    {   
-        if(kick_dirty)
-        {
-            gi.cprintf(NULL,PRINT_HIGH,"CDS already enabled!\n");
-            return;
-        }
-        kick_dirty = true;
-        gi.cvar_set("CDS client","required");
-        Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.mapname);
-        gi.AddCommandString (command);
-    }
-    else if (Q_stricmp (gi.argv(2), "off") == 0)
-    {
-        if(!kick_dirty)
-        {
-            gi.cprintf(NULL,PRINT_HIGH,"CDS already disabled!\n");
-            return;
-        }
-        kick_dirty = false;
-        gi.cvar_set("CDS client","optional");
-        Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.mapname);
-        gi.AddCommandString (command);
-    }
-    else
-        gi.cprintf(NULL,PRINT_HIGH,"USAGE: cds <on/off>\nNOTE: You don't need to use arrow brackets!\n");
-    
-}
-
 
 void SVCmd_Mute_f (void)
 {
@@ -348,16 +308,14 @@ void	ServerCommand (void)
 		SVCmd_ListIP_f ();
 	else if (Q_stricmp (cmd, "writeip") == 0)
 		SVCmd_WriteIP_f ();
-    else if (Q_stricmp (cmd, "cds") == 0)
-		SVCmd_Enable_CDS_f ();
-    else if (!Q_stricmp(cmd,"banip")) 
-        Cmd_BanDicks_f(NULL, 1);
-    else if (!Q_stricmp(cmd,"listdicks")) 
-        Cmd_ListDicks_f(NULL);
-    else if (!Q_stricmp(cmd,"banname")) 
-        Cmd_BanDicks_f(NULL, 0);
-    else if (!Q_stricmp(cmd,"mute")) 
-        SVCmd_Mute_f();
+  else if (!Q_stricmp(cmd,"banip")) 
+    Cmd_BanDicks_f(NULL, 1);
+  else if (!Q_stricmp(cmd,"listdicks")) 
+    Cmd_ListDicks_f(NULL);
+  else if (!Q_stricmp(cmd,"banname")) 
+    Cmd_BanDicks_f(NULL, 0);
+  else if (!Q_stricmp(cmd,"mute")) 
+    SVCmd_Mute_f();
 	else
 		gi.cprintf (NULL, PRINT_HIGH, "Unknown server command \"%s\"\n", cmd);
 }

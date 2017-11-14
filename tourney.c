@@ -31,7 +31,6 @@ int num_rconx_pass;
 int keep_admin_status;
 int default_random_map;
 int disable_anon_text;
-int kick_dirty;
 int disable_curse;
 //int enable_asc;
 int unlimited_curse;

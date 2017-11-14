@@ -23,7 +23,6 @@
 #define		KEEP_ADMIN_STRING		"keep_admin_status"
 #define		DEFAULT_RANDOM_MAP_STRING	"default_random_map"
 #define		DISABLE_ANON_TEXT_STRING	"disable_anon_text"
-#define		KICK_DIRTY_STRING		"kick_dirty"
 #define		DISABLE_CURSE_STRING	"disable_curse"
 #define		UNLIMITED_CURSE_STRING	"unlimited_curse"
 #define		DISABLE_ASC_STRING	    "disable_asc"
@@ -63,7 +62,6 @@
 #define		KEEP_ADMIN_KEYWORD			23
 #define		DEFAULT_RANDOM_MAP_KEYWORD	24
 #define		DISABLE_ANON_TEXT_KEYWORD	25
-#define		KICK_DIRTY_KEYWORD			27
 #define		DISABLE_CURSE_KEYWORD		28
 #define		ENABLE_SEE_KILLER_HEALTH_KEYWORD 29
 #define		UNLIMITED_CURSE_KEYWORD		30

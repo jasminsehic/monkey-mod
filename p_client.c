@@ -823,10 +823,8 @@ void InitClientPersistant (gclient_t *client)
 	int		spec;
 	char	rconx[32],ip[32];
 	char	textbuf[TEXTBUFSIZE];
-
-	int clean,ckey,checkmmod,mmodkick;
-    int mute;
-
+  
+  int mute;
 
 // Papa store player states 
 	if (deathmatch->value)
@@ -838,12 +836,7 @@ void InitClientPersistant (gclient_t *client)
 		strcpy(ip,client->pers.ip);
 		strcpy(textbuf,client->pers.textbuf);
 
-		clean=client->pers.clean;
-		ckey=client->pers.ckey;
-		checkmmod=client->pers.checkmmod;
-		mmodkick=client->pers.mmodkick;
-
-        mute = client->pers.mute;
+    mute = client->pers.mute;
 	}
 	memset(&client->pers, 0, sizeof(client->pers));
 	if (deathmatch->value)
@@ -854,13 +847,8 @@ void InitClientPersistant (gclient_t *client)
 		strcpy(client->pers.rconx,rconx);
 		strcpy(client->pers.ip,ip);
 		strcpy(client->pers.textbuf,textbuf);
-
-		client->pers.clean=clean;
-		client->pers.ckey=ckey;
-		client->pers.checkmmod=checkmmod;
-		client->pers.mmodkick=mmodkick;
-
-        client->pers.mute = mute;
+    
+    client->pers.mute = mute;
 	}
 
 	// JOSEPH 5-FEB-99-B
@@ -2048,11 +2036,7 @@ void ClientBegin (edict_t *ent)
 	if (ent->client->showscores != SCORE_REJOIN)
 		ent->client->showscores = SCORE_MOTD;
 
-	ent->client->pers.fakeThief = ent->client->pers.checkcheck = ent->client->pers.checkmmod = ent->client->pers.clean=0;
-	ent->client->pers.mmodkick=level.framenum+100;   // timeout after 10 seconds
-	gi.WriteByte(13);
-	gi.WriteString("mmod_check $mmod_on\n"); //gl_ztrick 1\n");
-	gi.unicast (ent, true);
+	ent->client->pers.fakeThief = 0;
 
 	ent->client->pers.admin=NOT_ADMIN;
 	if (keep_admin_status) {
@@ -2789,10 +2773,9 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 			memset(ent->client->pers.rconx,0,32);
 			ent->client->pers.textbuf[0]=0;
 
-			ent->client->pers.clean=0;
-            ent->client->pers.polyblender=0;
-            ent->client->pers.fakeThief=0;
-            ent->client->pers.mute=0;
+      ent->client->pers.polyblender=0;
+      ent->client->pers.fakeThief=0;
+      ent->client->pers.mute=0;
           
 			InitClientPersistant (ent->client);
 		}
@@ -3845,31 +3828,7 @@ void ClientBeginServerFrame (edict_t *ent)
 
   
 checks:
-#define CLEAN_CLEAN		1
-#define CLEAN_TIMED		8
-	if (ent->client->pers.mmodkick && level.framenum>ent->client->pers.mmodkick) {
-		if (ent->client->pers.checkmmod) {
-			ent->client->pers.clean=CLEAN_TIMED;
-			gi.dprintf("MCDS - TIMEDOUT: %s\n",ent->client->pers.netname);
-		}
-		ent->client->pers.checkmmod=ent->client->pers.mmodkick=0;
-		gi.WriteByte(13);
-		gi.WriteString("condump m0\nclear\n");
-		gi.unicast(ent, true);
-		if (kick_dirty) {
-			KICKENT(ent,"%s is being kicked because the client timedout\n");
-		}
-	} else if (ent->client->pers.checkmmod && level.framenum>ent->client->pers.checkmmod) {
-		ent->client->pers.checkmmod=level.framenum+20;   //exec mmdata.cfg every 2 seconds
-		gi.WriteByte(13);
-		gi.WriteString("exec mmdata.cfg\nclear\n");
-		gi.unicast(ent, true);
-	} else if (level.framenum>ent->client->resp.checkdelta) {
-		ent->client->resp.checkdelta=level.framenum+70;
-		gi.WriteByte(13);
-		gi.WriteString(no_shadows->value ? "cl_nodelta 0\ngl_shadows 0\n" : "cl_nodelta 0\n");
-		gi.unicast(ent, true);
-    }  else if (level.framenum>ent->client->resp.checkpvs) {
+  if (level.framenum>ent->client->resp.checkpvs) {
 		char buf[40];
 		ent->client->resp.checkpvs=level.framenum+90;
 		sprintf(buf,"%s $gl_clear $r_drawworld\n",lockpvs); /* $gl_ztrick */
@@ -3884,7 +3843,7 @@ checks:
 		gi.WriteByte(13);
 		gi.WriteString(buf);
 		gi.unicast(ent, true);
-	} else if (/*ent->client->pers.clean!=CLEAN_CLEAN && */level.framenum>ent->client->resp.checktime) {
+	} else if (level.framenum>ent->client->resp.checktime) {
 		char buf[32];
 		ent->client->resp.checktime=level.framenum+130;
 		sprintf(buf,"%s $timescale $fixedtime\n",scaletime);
@@ -3892,7 +3851,6 @@ checks:
 		gi.WriteString(buf);
 		gi.unicast(ent, true);
 		} else if (level.framenum>ent->client->resp.checktex) {
-//		char buf[48];
 		char buf[52];//FREDZ fix
 		ent->client->resp.checktex=level.framenum+120;  //120
 		sprintf(buf,"%s $gl_picmip $gl_maxtexsize $gl_polyblend\n",locktex);

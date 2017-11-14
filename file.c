@@ -112,9 +112,6 @@ int proccess_line(char*	buffer)
 	if (strstr(buffer, DISABLE_ANON_TEXT_STRING))
 		return DISABLE_ANON_TEXT_KEYWORD;
 
-	if (strstr(buffer, KICK_DIRTY_STRING))
-		return KICK_DIRTY_KEYWORD;
-
 	if (strstr(buffer, DISABLE_CURSE_STRING))
 		return DISABLE_CURSE_KEYWORD;
 
@@ -173,7 +170,6 @@ int proccess_ini_file()
 	keep_admin_status = false;
 	default_random_map = false;
 	disable_anon_text = false;
-	kick_dirty = false;
 	disable_curse = false;
     unlimited_curse = false;
 //    enable_asc = false;
@@ -294,10 +290,6 @@ int proccess_ini_file()
 			break;
 		case DISABLE_ANON_TEXT_KEYWORD:
 			disable_anon_text = true;
-			break;
-		case KICK_DIRTY_KEYWORD:
-			kick_dirty = true;
-			gi.cvar_set("CDS client","required");
 			break;
 		case DISABLE_CURSE_KEYWORD:
 			disable_curse = true;

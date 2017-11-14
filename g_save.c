@@ -392,9 +392,6 @@ void InitGame (void)
 	gi.cvar(TIMENAME, "", CVAR_SERVERINFO);
 	gi.cvar_set(TIMENAME,"");
 
-	gi.cvar("CDS client", "", CVAR_SERVERINFO);
-	gi.cvar_set("CDS client","optional");
-
 	g_select_empty = gi.cvar ("g_select_empty", "0", CVAR_ARCHIVE);
 
 	run_pitch = gi.cvar ("run_pitch", "0.002", 0);

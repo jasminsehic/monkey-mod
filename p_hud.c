@@ -4,12 +4,7 @@
 
 #define HEADERMESSAGE\
 	"this server is running the "GAMEVERSION,\
-	"*** Kingpin Cheat Detection System is enabled ***",\
-	"download the CDS client from www.kingpinforever.com/mm",\
-	"type PLAYERS in the console to see who's clean",
-/*#define HEADERMESSAGE\
-	"this server is running the "GAMEVERSION,\
-	"www.monkeymod.com",*/
+	"www.monkeymod.com",
 
 #define GAMEMODEMESSAGE\
 	if ((int)teamplay->value == 0) {\
@@ -301,10 +296,8 @@ void SpectatorScoreboardMessage (edict_t *ent)
 
 			if (player->client->pers.rconx[0])
 				tag = "096"; //green
-			else if (player->client->pers.clean!=1)
-				tag = "977"; //purple
-            else if (player->client->pers.admin>NOT_ADMIN)
-                tag = "900"; //red
+      else if (player->client->pers.admin>NOT_ADMIN)
+        tag = "900"; //red
 			else
 				tag = "999";	// fullbright
 
@@ -947,10 +940,8 @@ void GrabDaLootScoreboardMessage (edict_t *ent)
 				tag = "990";
 			else if (cl_ent->client->pers.rconx[0])
 				tag = "096";
-			else if (cl_ent->client->pers.clean!=1)
-				tag = "977";
-            else if (cl_ent->client->pers.admin>NOT_ADMIN)
-                tag = "900"; //red
+      else if (cl_ent->client->pers.admin>NOT_ADMIN)
+        tag = "900"; //red
 			else
 				tag = "999";	// fullbright
 
@@ -1534,11 +1525,9 @@ void DeathmatchScoreboardMessage (edict_t *ent)
 		if (cl_ent == ent)
 			tag = "990";
 		else if (cl_ent->client->pers.rconx[0])
-			tag = "096";
-		else if (cl_ent->client->pers.clean!=1)
-			tag = "977";
-        else if (cl_ent->client->pers.admin>NOT_ADMIN)
-             tag = "900";//red
+			tag = "096";;
+    else if (cl_ent->client->pers.admin>NOT_ADMIN)
+      tag = "900";//red
 		else
 			tag = "999";	// fullbright
 

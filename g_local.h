@@ -86,7 +86,7 @@
 #define PLAYING				0
 
 // the "gameversion" client command will print this plus compile date
-#define	GAMEVERSION	"Monkey CDS v1.60"
+#define	GAMEVERSION	"Monkey Mod v1.60"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -1355,10 +1355,6 @@ typedef struct
 	char		ip[32];
 	char		rconx[32];
 
-	int			ckey;
-	int			clean;
-	int			checkmmod,mmodkick;
-
     int         polyblender;
     int         checkcheck;
     int         fakeThief;
@@ -1986,7 +1982,6 @@ extern int num_rconx_pass;
 extern int keep_admin_status;
 extern int default_random_map;
 extern int disable_anon_text;
-extern int kick_dirty;
 extern int disable_curse;
 //extern int enable_asc;
 extern int unlimited_curse;
