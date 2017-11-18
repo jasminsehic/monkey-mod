@@ -111,7 +111,12 @@ typedef struct
 	void	(*setmodel) (edict_t *ent, char *name);
 
 	// collision detection
+#if __linux__
+	// callee_pop_aggregate_return attribute allows modern GCC to be used
+	trace_t	(*trace) (vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, edict_t *passent, int contentmask) __attribute__((callee_pop_aggregate_return(0)));
+#else
 	trace_t	(*trace) (vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, edict_t *passent, int contentmask);
+#endif
 	int		(*pointcontents) (vec3_t point);
 	qboolean	(*inPVS) (vec3_t p1, vec3_t p2);
 	qboolean	(*inPHS) (vec3_t p1, vec3_t p2);

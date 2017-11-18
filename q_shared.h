@@ -131,7 +131,7 @@ extern vec3_t vec3_origin;
 #define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
 
 // microsoft's fabs seems to be ungodly slow...
-float Q_fabs (float f);
+//float Q_fabs (float f);
 //#define	fabs(f) Q_fabs(f)
 #if !defined C_ONLY && !defined __linux__
 extern long Q_ftol( float f );
@@ -139,15 +139,11 @@ extern long Q_ftol( float f );
 #define Q_ftol( f ) ( long ) (f)
 #endif
 
-#ifdef __MWERKS__
-long _ftol(float f);
-#endif
-
 void vectoangles (vec3_t value1, vec3_t angles);
 
 // JOSEPH 6-NOV-98
-#ifdef _WIN32
-_inline vec_t DotProduct(x,y)
+#if 0//def _WIN32
+_inline vec_t DotProduct(const vec3_t x, const vec3_t y)
 {
   float dotprod;
   _asm
@@ -253,9 +249,10 @@ void Com_PageInMemory (byte *buffer, int size);
 //=============================================
 
 // portable case insensitive compare
-int Q_stricmp (char *s1, char *s2);
-int Q_strcasecmp (char *s1, char *s2);
-int Q_strncasecmp (char *s1, char *s2, int n);
+//int Q_stricmp (char *s1, char *s2);
+#define Q_stricmp(s1,s2) Q_strcasecmp(s1,s2)
+int Q_strcasecmp (const char *s1, const char *s2);
+int Q_strncasecmp (const char *s1, const char *s2, int n);
 
 //=============================================
 
@@ -615,7 +612,12 @@ typedef struct
 	int			waterlevel;
 
 	// callbacks to test the world
+#if __linux__
+	// callee_pop_aggregate_return attribute allows modern GCC to be used
+	trace_t		(*trace) (vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end) __attribute__((callee_pop_aggregate_return(0)));
+#else
 	trace_t		(*trace) (vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end);
+#endif
 	int			(*pointcontents) (vec3_t point);
 
 	// JOSEPH 1-SEP-98
@@ -1058,6 +1060,7 @@ typedef enum
 #define	CHAN_ITEM               3
 #define	CHAN_BODY               4
 #define	CHAN_SPECIAL			5
+#define CHAN_BULLET				6
 // modifier flags
 #define	CHAN_NO_PHS_ADD			8	// send to all clients, not just ones in PHS (ATTN 0 will also do this)
 #define	CHAN_RELIABLE			16	// send by reliable message, not datagram
@@ -1071,8 +1074,6 @@ typedef enum
 
 
 // player_state->stats[] indexes
-
-// Papa - max is 32 phear
 #define STAT_CASH_PICKUP        0
 #define	STAT_HEALTH				1
 #define	STAT_AMMO_ICON			2
@@ -1147,6 +1148,7 @@ typedef enum
 #define	DF_NO_FALLING		8
 
 // Ridah, 27-may-99, not used
+//#define	DF_INSTANT_ITEMS	16
 #define	DF_DROP_CASH		16
 
 #define	DF_SAME_LEVEL		32
@@ -1387,7 +1389,6 @@ typedef struct entity_state_s
 	vec3_t	angles;
 	vec3_t	old_origin;		// for lerping
 	int		modelindex;
-    //tical
 //	int		modelindex2, modelindex3, modelindex4;	// weapons, CTF flags, etc
 	int		frame;
 	int		skinnum;
@@ -1467,4 +1468,3 @@ typedef struct
 	int			weapon_usage;
  	
 } player_state_t;
-
