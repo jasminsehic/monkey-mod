@@ -82,7 +82,7 @@
 #define SPECTATING			1
 #define PLAYING				0
 
-#define	GAMEVERSION	"Monkey Mod v2.0"
+#define	GAMEVERSION	"Monkey Mod v2.1"
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
